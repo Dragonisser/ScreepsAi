@@ -23,14 +23,10 @@ var roleDefender = {
             creep.attack(hostiles[0]);
         } else {
             if (creep.ticksToLive < 500 && !creep.memory.renew_process) {
-                var flag = Game.flags.F_Defend;
                 //creep.moveTo(targets[0]);
-                creep.moveTo(flag);
                 creep.memory.renew_process = true;
             } else if (creep.ticksToLive > 1000) {
                 creep.memory.renew_process = false;
-                var flag = Game.flags.F_Defend;
-                creep.moveTo(flag);
             }
             if (creep.memory.renew_process) {
                 try {

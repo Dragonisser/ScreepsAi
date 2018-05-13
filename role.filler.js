@@ -16,13 +16,19 @@ var roleFiller = {
             creep.memory.building = true;
         }
 
-        var targets = creep.room.find(FIND_STRUCTURES, {
+        var droppedEnergy = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
+            filter: (resource) => {
+                return resource.resourceType == RESOURCE_ENERGY && resource.amount > 20;
+            }
+        });
+
+        var targets = creep.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: (structure) => {
                 return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN ) &&
                     structure.energy < structure.energyCapacity;
             }
         });
-        var targetTower = creep.room.find(FIND_STRUCTURES, {
+        var targetTower = creep.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: (structure) => {
                 return structure.structureType == STRUCTURE_TOWER &&
                     structure.energy < structure.energyCapacity;
@@ -30,13 +36,18 @@ var roleFiller = {
         });
 
         if (creep.memory.building) {
-            if (targets.length > 0) {
-                if (creep.transfer(targets[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(targets[0]);
+            if (targets) {
+                if (creep.transfer(targets, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(targets);
+                }
+            } else if(targetTower) {
+                if (creep.transfer(targetTower, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(targetTower);
                 }
             } else {
-                if (creep.transfer(targetTower[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(targetTower[0]);
+                var storage = creep.room.storage;
+                if (creep.transfer(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(storage);
                 }
             }
         } else {
@@ -49,35 +60,23 @@ var roleFiller = {
 
             var cost = 0;
             var oldCost = 1000;
-            if (links.length > 0) {
+            if (links.length > 0 && targets) {
                 for (x = 0; x < links.length; x++) {
-                    console.log("-----------")
-                    console.log(links[x])
-                    console.log(targets[0])
-                    console.log("#########")
-                    cost = PathFinder.search(targets[0].pos, links[x].pos).cost;
-                    if(cost < oldCost) {
+                    cost = PathFinder.search(targets.pos, links[x].pos).cost;
+                    if (cost < oldCost) {
                         oldCost = cost;
                         closesToStructure = links[x];
                     }
                 }
-                console.log(links[x]);
-                console.log(targets[0]);
-                console.log(oldCost);
-                console.log(cost);
-                console.log(closesToStructure)
-                console.log("-----------")
             }
 
-            var storage = creep.room.storage;
-            if (closesToStructure && closesToStructure.energy > 0) {
+            if (droppedEnergy) {
+                creep.moveTo(droppedEnergy);
+                creep.pickup(droppedEnergy, RESOURCE_ENERGY);
+            } else if (closesToStructure && closesToStructure.energy > 0) {
                 creep.moveTo(closesToStructure);
                 creep.withdraw(closesToStructure, RESOURCE_ENERGY);
-            } else {
-                creep.moveTo(storage);
-                creep.withdraw(storage, RESOURCE_ENERGY);
             }
-
         }
     }
 };

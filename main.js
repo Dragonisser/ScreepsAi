@@ -4,7 +4,7 @@ var roleBuilder = require('role.builder');
 var roleRepair = require('role.repair');
 var roleDefender = require('role.defender');
 var roleAttacker = require('role.attacker');
-var roleNotifyer = require('role.notifyer');
+var roleNotifier = require('role.notifier');
 var roleHarvesterRoom = require('role.harvester_room');
 var roleClaimer = require('role.claimer');
 var roleFiller = require('role.filler');
@@ -85,7 +85,7 @@ module.exports.loop = function () {
                         var creep = spawn.spawnCreep([ATTACK, ATTACK, ATTACK, ATTACK, MOVE, MOVE, MOVE, MOVE], "Defender_R_" + rooms_around[x] + "_" + number, {
                             memory: {
                                 role: 'defender',
-                                room_dest: rooms_around[x],
+                                room_dest: room.name,
                                 room_spawn: room.name,
                                 flag_dest_x: '28',
                                 flag_dest_y: '11'
@@ -319,7 +319,7 @@ module.exports.loop = function () {
 
     for (var name in Game.creeps) {
         var creep = Game.creeps[name];
-        //roleNotifyer.run(creep);
+        //roleNotifier.run(creep);
         switch (creep.memory.role) {
             case 'harvester':
                 roleHarvester.run(creep);
