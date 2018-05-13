@@ -12,50 +12,297 @@ var roleFiller = require('role.filler');
 var structureTower = require('structure.tower');
 var structureLink = require('structure.link');
 
-var spawns = 1;
 
-var harvester_spawn = 2 * spawns;
+var harvester_spawn = 3;
 var harvester_room_spawn = 3;
-var upgrader_spawn = 5 * spawns;
-var builder_spawn = spawns * 0;
+var upgrader_spawn = 3;
+var builder_spawn = 0;
 var repair_spawn = 0;
-var defender_spawn = 0;
-var claimer_spawn = 1;
+var defender_spawn = 2;
+var claimer_spawn = 0;
 var filler_spawn = 0;
 
-
-var room_list;
-var spawn_list;
-
-var room_count = new Map();
-var rooms_around = ["W7N4", "W8N4"];
+var spawn = Game.spawns.Spawn1.room.name;
+var rooms_around = [spawn, "W7N4", "W8N3", "W8N4", "W6N3"];
 
 module.exports.loop = function () {
 
-    for (var rooms in Game.rooms) {
-        room_list = rooms;
-        var room = Game.rooms[rooms];
-        var const_site = room.find(FIND_CONSTRUCTION_SITES);
+    var role_Harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester');
+    var role_Harvesters_room = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester_room');
+    var role_Builders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder');
+    var role_Upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == 'upgrader');
+    var role_Repairs = _.filter(Game.creeps, (creep) => creep.memory.role == 'repair');
+    var role_Defenders = _.filter(Game.creeps, (creep) => creep.memory.role == 'defender');
+    var role_Claimers = _.filter(Game.creeps, (creep) => creep.memory.role == 'claimer');
+    var role_Fillers = _.filter(Game.creeps, (creep) => creep.memory.role == 'filler');
+
+    for (var spawns in Game.spawns) {
+        var spawn = Game.spawns[spawns];
+        var room = spawn.room;
+
+        for (var x = 0; x < rooms_around.length; x++) {
+
+            var room_Harvesters_room = _.filter(role_Harvesters_room, (creep) => creep.memory.room_dest == rooms_around[x]);
+            var room_Claimers = _.filter(role_Claimers, (creep) => creep.memory.room_dest == rooms_around[x]);
+
+            var room_Upgraders = _.filter(role_Upgraders, (creep) => creep.memory.room_dest == room.name);
+            var room_Harvesters = _.filter(role_Harvesters, (creep) => creep.memory.room_dest == room.name);
+            var room_Builders = _.filter(role_Builders, (creep) => creep.memory.room_dest == room.name);
+            var room_Repairs = _.filter(role_Repairs, (creep) => creep.memory.room_dest == room.name);
+            var room_Defenders = _.filter(role_Defenders, (creep) => creep.memory.room_dest == room.name);
+            var room_Fillers = _.filter(role_Fillers, (creep) => creep.memory.room_dest == room.name);
+
+
+            /*
+             console.log("room_Harvesters_room " + room_Harvesters_room.length);
+             console.log("room_Claimers " + room_Claimers.length);
+             console.log("room_Upgraders " + room_Upgraders.length);
+
+             console.log("room_Harvesters " + room_Harvesters.length);
+             console.log("room_Builders " + room_Builders.length);
+             console.log("room_Repairs " + room_Repairs.length);
+             console.log("room_Defenders " + room_Defenders.length);
+             console.log("room_Fillers " + room_Fillers.length);
+             */
+            /*
+             console.log("room_Harvesters_room " + room_Harvesters_room + " - " + rooms_around[x]);
+             console.log("room_Claimers " + room_Claimers + " - " + rooms_around[x]);
+             console.log("room_Upgraders " + room_Upgraders + " - " + rooms_around[x]);
+
+             console.log("room_Harvesters " + room_Harvesters + " - " + room.name);
+             console.log("room_Builders " + room_Builders + " - " + room.name);
+             console.log("room_Repairs " + room_Repairs + " - " + room.name);
+             console.log("room_Defenders " + room_Defenders + " - " + room.name);
+             console.log("room_Fillers " + room_Fillers + " - " + room.name);
+             */
+
+            //Defender
+            var hostiles = room.find(FIND_HOSTILE_CREEPS);
+            if (hostiles.length > 0) {
+                if (room_Defenders.length < defender_spawn) {
+                    var number = Math.floor(Math.random() * (room_Defenders.length - 0 + 1)) + 0;
+                    if (spawn.spawnCreep([ATTACK, ATTACK, ATTACK, ATTACK, MOVE, MOVE, MOVE, MOVE], "Defender_R_" + rooms_around[x] + number, {dryRun: true}) == 0) {
+                        var creep = spawn.spawnCreep([ATTACK, ATTACK, ATTACK, ATTACK, MOVE, MOVE, MOVE, MOVE], "Defender_R_" + rooms_around[x] + "_" + number, {
+                            memory: {
+                                role: 'defender',
+                                room_dest: rooms_around[x],
+                                room_spawn: room.name,
+                                flag_dest_x: '28',
+                                flag_dest_y: '11'
+                            }
+                        });
+                    }
+                }
+            }
+
+            //###CLAIMING ROOMS START###
+
+            //Claimer
+            var ownedRooms = 0;
+            var allRooms;
+            var allRoom;
+            var allRoomSpawn;
+            var allRoomSpawnBuild;
+
+            for (allRooms in Game.rooms) {
+                allRoom = Game.rooms[allRooms];
+                if (allRoom.controller.my) {
+
+                    allRoomSpawnBuild = allRoom.find(FIND_STRUCTURES, {
+                        filter: (structure) => {
+                            return structure.structureType == STRUCTURE_SPAWN;
+                        }
+                    });
+                    if (allRoomSpawnBuild.length == 0) {
+                        allRoomSpawn = allRoom.find(FIND_CONSTRUCTION_SITES, {
+                            filter: (structure) => {
+                                return structure.structureType == STRUCTURE_SPAWN;
+                            }
+                        });
+                    }
+                    //console.log(allRoomSpawn)
+                    ownedRooms++;
+                }
+            }
+            if (Game.gcl.level > 1 && ownedRooms < Game.gcl.level) {
+                claimer_spawn = Game.gcl.level - ownedRooms;
+            }
+            if (room_Claimers.length < claimer_spawn) {
+                for (var toClaim in rooms_around) {
+                    var toClaimRoom = Game.rooms[rooms_around[toClaim]];
+                    if (toClaimRoom != undefined) {
+                        if (!toClaimRoom.controller.my) {
+                            var toClaimName = toClaimRoom.name;
+                            console.log(toClaimName)
+                            var number = Math.floor(Math.random() * (room_Claimers.length + 1)) + 0;
+                            if (spawn.spawnCreep([CLAIM, CLAIM, MOVE, MOVE, MOVE, MOVE], "Claimer_" + number, {dryRun: true}) == 0) {
+                                var creep = spawn.spawnCreep([CLAIM, CLAIM, MOVE, MOVE, MOVE, MOVE], "Claimer_" + number, {
+                                    memory: {
+                                        role: 'claimer',
+                                        room_dest: toClaimName
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            //###CLAIMING ROOMS END###
+
+
+            //HARVESTER
+            if (room_Harvesters.length < harvester_spawn) {
+                var number = Math.floor(Math.random() * (room_Harvesters.length + 1)) + 0;
+                if (room.energyAvailable > 800) {
+                    if (spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], "Harvester_" + room.name + "_" + number, {dryRun: true}) == 0) {
+                        var creep = spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], "Harvester_" + room.name + "_" + number, {
+                            memory: {
+                                role: 'harvester',
+                                room_dest: room.name
+                            }
+                        });
+                    }
+                } else {
+                    if (spawn.spawnCreep([WORK, CARRY, MOVE], "Harvester_" + room.name + "_" + number, {dryRun: true}) == 0) {
+                        var creep = spawn.spawnCreep([WORK, CARRY, MOVE], "Harvester_" + room.name + "_" + number, {
+                            memory: {
+                                role: 'harvester',
+                                room_dest: room.name
+                            }
+                        });
+                    }
+                }
+            }
+
+            //HARVESTER_ROOM
+            var controllerInRoom = Game.rooms[rooms_around[x]];
+            var roomConstruct = Game.rooms[rooms_around[x]];
+            var constructSpawn;
+            if (roomConstruct != undefined) {
+                constructSpawn = roomConstruct.find(FIND_CONSTRUCTION_SITES, {
+                    filter: (structure) => {
+                        return structure.structureType == STRUCTURE_SPAWN;
+                    }
+                });
+            }
+            if (controllerInRoom == undefined || constructSpawn.length > 0) {
+                if (room_Harvesters_room.length < harvester_room_spawn) {
+                    var number = Math.floor(Math.random() * (room_Harvesters_room.length - 0 + 1)) + 0;
+                    if (spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], "Harvester_R_" + rooms_around[x] + number, {dryRun: true}) == 0) {
+                        var creep = spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], "Harvester_R_" + rooms_around[x] + "_" + number, {
+                            memory: {
+                                role: 'harvester_room',
+                                room_dest: rooms_around[x],
+                                room_spawn: room.name,
+                                flag_dest_x: '28',
+                                flag_dest_y: '11'
+                            }
+                        });
+                    }
+                }
+            }
+
+
+            //UPGRADER
+            var controllerLevel = room.controller.level;
+
+            if (controllerLevel < 4) {
+                upgrader_spawn = 3;
+            } else {
+                upgrader_spawn = 5
+            }
+            if (room_Upgraders.length < upgrader_spawn && room_Harvesters.length > 0) {
+                var number = Math.floor(Math.random() * (room_Upgraders.length - 0 + 1)) + 0;
+                if (room.energyAvailable > 800 && controllerLevel > 4) {
+                    if (spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE], "Upgrader_" + room.name + "_" + number, {dryRun: true}) == 0) {
+                        var creep = spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE], "Upgrader_" + room.name + "_" + number, {
+                            memory: {
+                                role: 'upgrader',
+                                room_dest: room.name
+                            }
+                        });
+                    }
+                } else if (room.energyAvailable > 500 && controllerLevel > 1 && controllerLevel < 4) {
+                    if (spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE], "Upgrader_" + room.name + "_" + number, {dryRun: true}) == 0) {
+                        var creep = spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE], "Upgrader_" + room.name + "_" + number, {
+                            memory: {
+                                role: 'upgrader',
+                                room_dest: room.name
+                            }
+                        });
+                    }
+                } else {
+                    if (spawn.spawnCreep([WORK, CARRY, MOVE], "Upgrader_" + room.name + "_" + number, {dryRun: true}) == 0) {
+                        var creep = spawn.spawnCreep([WORK, CARRY, MOVE], "Upgrader_" + room.name + "_" + number, {
+                            memory: {
+                                role: 'upgrader',
+                                room_dest: room.name
+                            }
+                        });
+                    }
+                }
+
+            }
+
+            //BUILDER
+            var targets = room.find(FIND_CONSTRUCTION_SITES);
+            if (targets.length > 0 && targets.length <= 4) {
+                builder_spawn = 2;
+            } else if (targets.length > 4) {
+                builder_spawn = 4;
+            } else {
+                builder_spawn = 0
+            }
+            if (room_Builders.length < builder_spawn && room_Harvesters.length > 0) {
+                var number = Math.floor(Math.random() * (room_Builders.length - 0 + 1)) + 0;
+                if (room.energyAvailable > 600) {
+                    if (spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE], "Builder_" + room.name + "_" + number, {dryRun: true}) == 0) {
+                        var creep = spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE], "Builder_" + room.name + "_" + number, {
+                            memory: {
+                                role: 'builder',
+                                room_dest: room.name
+                            }
+                        });
+                    }
+                } else {
+                    if (spawn.spawnCreep([WORK, CARRY, MOVE], "Builder_" + room.name + "_" + number, {dryRun: true}) == 0) {
+                        var creep = spawn.spawnCreep([WORK, CARRY, MOVE], "Builder_" + room.name + "_" + number, {
+                            memory: {
+                                role: 'builder',
+                                room_dest: room.name
+                            }
+                        });
+                    }
+                }
+            }
+
+            //FILLER
+            var links = room.find(FIND_STRUCTURES, {
+                filter: (structure) => {
+                    return structure.structureType == STRUCTURE_LINK;
+                }
+            });
+            if (links.length > 0) {
+                filler_spawn = 1;
+            } else {
+                filler_spawn = 0
+            }
+            if (room_Fillers.length < filler_spawn) {
+                var number = Math.floor(Math.random() * (room_Fillers.length - 0 + 1)) + 0;
+                if (spawn.spawnCreep([WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE], "Filler_" + number, {dryRun: true}) == 0) {
+                    var creep = spawn.spawnCreep([WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE], "Filler_" + number, {
+                        memory: {
+                            role: 'filler',
+                            room_dest: room.name
+                        }
+                    });
+                }
+            }
+        }
     }
 
-    for (var spawnsL in Game.spawns) {
-        spawn_list = spawnsL;
-        var spawn = Game.spawns[spawnsL];
-
-        //console.log(spawn);
-    }
-
-
-    var targets = Game.rooms.W7N3.find(FIND_CONSTRUCTION_SITES);
-    if (targets.length > 0) {
-        builder_spawn = 1 * spawns;
-    } else {
-        builder_spawn = 0 * spawns
-    }
-
-    //for(var spawns2 in Game.spawns) {
-    //	//console.log(spawns2);
-    //}
 
     for (var name in Memory.creeps) {
         if (!Game.creeps[name]) {
@@ -64,220 +311,43 @@ module.exports.loop = function () {
         }
     }
 
-    var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester');
-    var harvesters_room = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester_room');
-    var builders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder');
-    var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == 'upgrader');
-    var repairs = _.filter(Game.creeps, (creep) => creep.memory.role == 'repair');
-    var defenders = _.filter(Game.creeps, (creep) => creep.memory.role == 'defender');
-    var claimers = _.filter(Game.creeps, (creep) => creep.memory.role == 'claimer');
-    var fillers = _.filter(Game.creeps, (creep) => creep.memory.role == 'filler');
-
-    var room_W7N3 = _.filter(Game.creeps, (creep) => creep.memory.room_dest == 'W7N3' && creep.memory.role == 'harvester_room');
-    //var room_W22N2 = _.filter(Game.creeps, (creep) => creep.memory.room_dest == 'W22N2' && creep.memory.role == 'harvester_room');
-
-    //var controller = Game.getObjectById('55db31b9efa8e3fe66e04d26');
-    //console.log(controller.room.energyAvailable);
-    //var room_W7N3 = Game.getObjectById('57701c9ac7eeb90a0684d00e').room;
-
-    var harvester_count = harvesters.length;
-    //var harvesters_room_count = harvesters_room.length;
-    var builder_count = builders.length;
-    var upgrader_count = upgraders.length;
-    var repair_count = repairs.length;
-    var defender_count = defenders.length;
-    var claimer_count = claimers.length;
-    var filler_count = fillers.length;
-
-    var room_W7N3_count = room_W7N3.length;
-    //var room_W22N2_count = room_W22N2.length;
-
-    var s_harvester_count = String(harvester_count);
-    //var s_harvesters_room_count = String(harvesters_room_count);
-    var s_builder_count = String(builder_count);
-    var s_upgrader_count = String(upgrader_count);
-    var s_repair_count = String(repair_count);
-    var s_defender_count = String(defender_count);
-    var s_filler_count = String(filler_count);
-
-    for (x = 1; x < spawns + 1; x++) {
-        if (harvester_count < harvester_spawn) {
-            switch (x) {
-                case 1:
-                    var newName = Game.spawns.Spawn1.createCreep([WORK, CARRY, MOVE], "Harvester_" + s_harvester_count, {role: 'harvester'});
-                    break;
-                //case 2: var newName = Game.spawns.Spawn2.createCreep([WORK,CARRY,MOVE], "Harvester_" + s_harvester_count , {role: 'harvester'});
-                //	break;
-            }
-        }
-
-
-        if (harvester_count >= 1) {
-            if (builder_count < builder_spawn) {
-                switch (x) {
-                    case 1:
-                        var newName = Game.spawns.Spawn1.createCreep([WORK, WORK, CARRY, CARRY, MOVE], "Builder_" + String(builder_count), {
-                            role: 'builder',
-                            room_dest: 'W7N3'
-                        });
-                        break;
-                    //case 2: var newName = Game.spawns.Spawn2.createCreep([WORK,CARRY,MOVE], "Builder_" + String(builder_count) , {role: 'builder', room_dest: 'W23N2'});
-                    //	break;
-                }
-            }
-            if (upgrader_count < upgrader_spawn) {
-                switch (x) {
-                    case 1:
-                        var newName = Game.spawns.Spawn1.createCreep([WORK, CARRY, MOVE], "Upgrader_" + String(upgrader_count), {
-                            role: 'upgrader',
-                            room_dest: 'W7N3'
-                        });
-                        break;
-                    //case 2: var newName = Game.spawns.Spawn2.createCreep([WORK,CARRY,MOVE], "Upgrader_" + String(upgrader_count) , {role: 'upgrader', room_dest: 'W23N2'});
-                    //	break;
-                }
-            }
-            if (repair_count < repair_spawn) {
-                var newName = Game.spawns.Spawn1.createCreep([WORK, CARRY, MOVE], "Repairer_" + s_repair_count, {role: 'repair'});
-                //var newName = Game.spawns.Spawn1.createCreep([WORK,WORK,WORK,CARRY,MOVE,MOVE], "Repairs_" + s_repair_count , {role: 'repair'});
-            }
-            if (defender_count < defender_spawn) {
-                var newName = Game.spawns.Spawn1.createCreep([ATTACK, ATTACK, ATTACK, ATTACK, TOUGH, MOVE, MOVE], "Defender_" + s_defender_count, {role: 'defender'});
-                //var newName = Game.spawns.Spawn1.createCreep([ATTACK,ATTACK,TOUGH,MOVE,MOVE], "Defenders_" + s_defender_count , {role: 'defender'});
-            }
-            if (claimer_count < claimer_spawn) {
-                var newName = Game.spawns.Spawn1.createCreep([CLAIM, CLAIM, MOVE], "Claimer", {
-                    role: 'claimer',
-                    room_dest: 'W7N4'
-                })
-            }
-            //if(filler_count < filler_spawn) {
-            //	if(room_w23n3.energyAvailable > 300) {
-            //		var newName = Game.spawns.Spawn1.createCreep([WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE], "Filler" + s_filler_count , {role: 'filler'})
-            //	} else {
-            //		var newName = Game.spawns.Spawn1.createCreep([WORK,CARRY,MOVE], "Filler_" + s_filler_count , {role: 'filler'})
-            //	}
-
-            //}
-        }
-
-    }
-
-
-    var harvesters_room_count = 0;
-    if (Game.spawns.Spawn1.room.controller.level > 3) {
-        for (var name in Game.creeps) {
-            var creep = Game.creeps[name];
-            for (var i = 0; i < rooms_around.length; i++) {
-                room_count.set(rooms_around[i], 0)
-            }
-        }
-        for (var name in Game.creeps) {
-            var creep = Game.creeps[name];
-            for (var i = 0; i < rooms_around.length; i++) {
-                var dest = creep.memory.room_dest;
-                if (creep.memory.role == 'harvester_room') {
-                    if (dest == rooms_around[i]) {
-                        var count = 0;
-                        if (room_count.has(dest)) {
-                            count = room_count.get(dest);
-                            if (count < harvester_room_spawn) {
-                                room_count.set(dest, count + 1);
-                            }
-                        } else {
-                            room_count.set(dest, 1)
-                        }
-                    }
-                }
-            }
-        }
-        if (room_count.size >= 0) {
-            for (var [key, value] of room_count) {
-                //console.log("Rooms with count: " + key + " | " + value);
-                if (room_count.get(key) < harvester_room_spawn) {
-                    //console.log("not enough harvester: " + room_count.get(key) + " / " + harvester_room_spawn);
-                    Game.spawns.Spawn1.createCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE], "Harvester_" + key + "_" + room_count.get(key), {
-                        role: 'harvester_room',
-                        room_dest: key,
-                        flag_dest_x: '28',
-                        flag_dest_y: '11'
-                    });
-                } else {
-                    //console.log("enough harvester: " + room_count.get(key) + " / " + harvester_room_spawn);
-                }
-            }
-        }
-    }
-
-
-    //Game.spawns.Spawn1.createCreep([WORK,WORK,CARRY,CARRY,MOVE, MOVE], "Harvester_W7N4_" + 0, {role: 'harvester_room', room_dest: 'W7N4', flag_dest_x: '28', flag_dest_y: '11'});
-
-    //if(harvesters_room_count < harvester_room_spawn) {
-    //console.log(room_W23N2_count + " " + (harvester_room_spawn / 2) + " " + room_W23N2);
-    //console.log(room_W22N2_count + " " + (harvester_room_spawn / 2) + " " + room_W22N2);
-
-    //if(room_W7N3_count < (harvester_room_spawn)) {
-    //console.log("Missing " + ((harvester_room_spawn / 2) - room_W23N2_count)+ " harvester in room W23N2")
-    //var newName = Game.spawns.Spawn1.createCreep([WORK,WORK,CARRY,CARRY,MOVE, MOVE], "Harvester_W23N2_" + s_harvesters_room_count, {role: 'harvester_room', room_dest: 'W23N2', flag_dest_x: '28', flag_dest_y: '11'});
-    //}
-    //if(room_W22N2_count < (harvester_room_spawn)) {
-    //	//console.log("Missing " + ((harvester_room_spawn / 2) - room_W22N2_count)+ " harvester in room W22N2")
-    //	var newName = Game.spawns.Spawn1.createCreep([WORK,WORK,CARRY,CARRY,MOVE, MOVE], "Harvester_W22N2_" + s_harvesters_room_count, {role: 'harvester_room', room_dest: 'W22N2', flag_dest_x: '8', flag_dest_y: '10'});
-    //	// Game.spawns.Spawn1.createCreep([WORK,WORK,CARRY,CARRY,MOVE, MOVE], undefined, {role: 'harvester_room', room_dest: 'W22N2', flag_dest_x: '8', flag_dest_y: '10'});
-    //}
-
-    //var newName = Game.spawns.Spawn1.createCreep([WORK,WORK,CARRY,CARRY,MOVE,MOVE], "Harvester_" + s_harvester_count , {role: 'harvester'});
-    // }
-    rooms.empt
-
-    for (var name in Game.creeps) {
-        var creep = Game.creeps[name];
-        var room = creep.room;
-        if (creep.memory.role == 'harvester') {
-            roleHarvester.run(creep);
-        }
-        if (creep.memory.role == 'upgrader') {
-            roleUpgrader.run(creep);
-        }
-        if (creep.memory.role == 'builder') {
-            var targets = creep.room.find(FIND_CONSTRUCTION_SITES);
-            if (targets.length > 0) {
-                roleBuilder.run(creep);
-            } else {
-                roleHarvester.run(creep);
-            }
-        }
-        if (creep.memory.role == 'repair') {
-            roleRepair.run(creep);
-        }
-        if (creep.memory.role == 'defender') {
-            roleDefender.run(creep);
-        }
-        if (creep.memory.role == 'attacker') {
-            roleAttacker.run(creep);
-        }
-        if (creep.memory.role == 'harvester_room') {
-            roleHarvesterRoom.run(creep);
-        }
-        if (creep.memory.role == 'claimer') {
-            roleClaimer.run(creep);
-        }
-        if (creep.memory.role == 'filler') {
-            roleFiller.run(creep);
-        }
-
-
-        roleNotifyer.run(creep);
+    for (var rooms in Game.rooms) {
+        var room = Game.rooms[rooms];
         structureTower.run(room);
         structureLink.run(room);
     }
 
-
-    // Game.spawns.Spawn1.createCreep([RANGED_ATTACK,RANGED_ATTACK,MOVE,MOVE], undefined , {role: 'defender'})
-    // Game.spawns.Spawn1.createCreep([CLAIM,MOVE], undefined , {role: 'claimer', room_dest: 'W23N2'})
-
-
-    // Game.spawns.Spawn1.createCreep([WORK,WORK,CARRY,CARRY,MOVE, MOVE], undefined, {role: 'harvester_room', room_dest: 'W23N2', flag_dest_x: '28', flag_dest_y: '11'});
-
-    // Game.spawns.Spawn1.createCreep([WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE], undefined, {role: 'upgrader', room_dest: 'W23N3'})
+    for (var name in Game.creeps) {
+        var creep = Game.creeps[name];
+        //roleNotifyer.run(creep);
+        switch (creep.memory.role) {
+            case 'harvester':
+                roleHarvester.run(creep);
+                break;
+            case 'upgrader':
+                roleUpgrader.run(creep);
+                break;
+            case 'builder':
+                roleBuilder.run(creep);
+                break;
+            case 'repair':
+                roleRepair.run(creep);
+                break;
+            case 'defender':
+                roleDefender.run(creep);
+                break;
+            case 'attacker':
+                roleAttacker.run(creep);
+                break;
+            case 'harvester_room':
+                roleHarvesterRoom.run(creep);
+                break;
+            case 'claimer':
+                roleClaimer.run(creep);
+                break;
+            case 'filler':
+                roleFiller.run(creep);
+                break;
+        }
+    }
 }
