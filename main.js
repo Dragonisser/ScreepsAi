@@ -23,7 +23,7 @@ var claimer_spawn = 0;
 var filler_spawn = 0;
 
 var spawn = Game.spawns.Spawn1.room.name;
-var rooms_around = [spawn, "W7N4", "W8N3", "W8N4", "W6N3"];
+var rooms_around = [spawn, "W7N4", "W8N2", "W8N3", "W8N4", "W6N3"];
 
 module.exports.loop = function () {
 
@@ -106,7 +106,7 @@ module.exports.loop = function () {
 
             for (allRooms in Game.rooms) {
                 allRoom = Game.rooms[allRooms];
-                if (allRoom.controller.my) {
+                if (allRoom.controller != null && allRoom.controller.my) {
 
                     allRoomSpawnBuild = allRoom.find(FIND_STRUCTURES, {
                         filter: (structure) => {
@@ -133,10 +133,9 @@ module.exports.loop = function () {
                     if (toClaimRoom != undefined) {
                         if (!toClaimRoom.controller.my) {
                             var toClaimName = toClaimRoom.name;
-                            console.log(toClaimName)
                             var number = Math.floor(Math.random() * (room_Claimers.length + 1)) + 0;
-                            if (spawn.spawnCreep([CLAIM, CLAIM, MOVE, MOVE, MOVE, MOVE], "Claimer_" + number, {dryRun: true}) == 0) {
-                                var creep = spawn.spawnCreep([CLAIM, CLAIM, MOVE, MOVE, MOVE, MOVE], "Claimer_" + number, {
+                            if (spawn.spawnCreep([CLAIM, CLAIM, MOVE, MOVE, MOVE, MOVE], "Claimer_" + toClaimName + "_" + number, {dryRun: true}) == 0) {
+                                var creep = spawn.spawnCreep([CLAIM, CLAIM, MOVE, MOVE, MOVE, MOVE], "Claimer_" + toClaimName + "_" + number, {
                                     memory: {
                                         role: 'claimer',
                                         room_dest: toClaimName
@@ -257,7 +256,16 @@ module.exports.loop = function () {
             }
             if (room_Builders.length < builder_spawn && room_Harvesters.length > 0) {
                 var number = Math.floor(Math.random() * (room_Builders.length - 0 + 1)) + 0;
-                if (room.energyAvailable > 600) {
+                if (room.energyAvailable > 1200) {
+                    if (spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE], "Builder_" + room.name + "_" + number, {dryRun: true}) == 0) {
+                        var creep = spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE], "Builder_" + room.name + "_" + number, {
+                            memory: {
+                                role: 'builder',
+                                room_dest: room.name
+                            }
+                        });
+                    }
+                } else if (room.energyAvailable > 600) {
                     if (spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE], "Builder_" + room.name + "_" + number, {dryRun: true}) == 0) {
                         var creep = spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE], "Builder_" + room.name + "_" + number, {
                             memory: {
@@ -290,9 +298,9 @@ module.exports.loop = function () {
                 filler_spawn = 0
             }
             if (room_Fillers.length < filler_spawn) {
-                var number = Math.floor(Math.random() * (room_Fillers.length - 0 + 1)) + 0;
-                if (spawn.spawnCreep([WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE], "Filler_" + number, {dryRun: true}) == 0) {
-                    var creep = spawn.spawnCreep([WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE], "Filler_" + number, {
+                var number = Math.floor(Math.random() * (room_Fillers.length + 1));
+                if (spawn.spawnCreep([WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE], "Filler_" + room.name + "_" + number, {dryRun: true}) == 0) {
+                    var creep = spawn.spawnCreep([WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE], "Filler_" + room.name + "_" + number, {
                         memory: {
                             role: 'filler',
                             room_dest: room.name

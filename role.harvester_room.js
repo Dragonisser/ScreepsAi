@@ -47,7 +47,7 @@ var roleHarvesterRoom = {
         var hostiles = creep.room.find(FIND_HOSTILE_CREEPS);
         var spawn = Game.rooms[room_spawn].find(FIND_STRUCTURES, {
             filter: (structure) => {
-                return structure.structureType == STRUCTURE_SPAWN
+                return structure.structureType == STRUCTURE_SPAWN && structure.my;
             }
         });
 
@@ -113,12 +113,12 @@ var roleHarvesterRoom = {
             } else {
                 var constructSpawn = creep.room.find(FIND_CONSTRUCTION_SITES, {
                     filter: (structure) => {
-                        return structure.structureType == STRUCTURE_SPAWN;
+                        return structure.structureType == STRUCTURE_SPAWN && structure.my;
                     }
                 });
                 var roomSpawn = creep.room.find(FIND_STRUCTURES, {
                     filter: (structure) => {
-                        return structure.structureType == STRUCTURE_SPAWN;
+                        return structure.structureType == STRUCTURE_SPAWN && structure.my;
                     }
                 });
                 if (constructSpawn.length > 0) {
