@@ -82,33 +82,29 @@ var roleHarvesterRoom = {
                 targets = creep.pos.findClosestByPath(targets);
                 //console.log(targets+" "+creep.name)
                 var target = Game.getObjectById('57833f1f5dfafa1e0c9e1a5e');
-                var targets_con = creep.room.find(FIND_STRUCTURES, {
-                    filter: (structure) => {
-                        return structure.structureType == STRUCTURE_CONTAINER;
-                    }
-                });
                 if (target && target.energy < target.energyCapacity) {
                     if (creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target);
+                        creep.moveTo(target, {visualizePathStyle: {stroke: '#ffffff'}});
                     }
                 } else if (targets) {
                     if (creep.transfer(targets, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(targets);
+                        creep.moveTo(targets, {visualizePathStyle: {stroke: '#ffffff'}});
                     }
                 } else if (creep.room.storage) {
                     if (creep.transfer(creep.room.storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(creep.room.storage);
+                        creep.moveTo(creep.room.storage, {visualizePathStyle: {stroke: '#ffffff'}});
                     }
                 } else {
-                    creep.moveTo(Game.rooms[room_spawn]);
+                    creep.moveTo(Game.rooms[room_spawn], {visualizePathStyle: {stroke: '#ffffff'}});
                 }
             }
-        } else if (creep.room == Game.rooms[room_dest] && hostiles.length <= 0) {
+        } else if (creep.room == Game.rooms[room_dest]) {
             if (creep.carry.energy < creep.carryCapacity && !creep.memory.building) {
+                creep.say("⛏︎")
                 var sources = creep.pos.findClosestByPath(FIND_SOURCES);
                 if (creep.harvest(sources) == ERR_NOT_IN_RANGE) {
                     creep.say("Gather!");
-                    creep.moveTo(sources);
+                    creep.moveTo(sources, {visualizePathStyle: {stroke: '#ffaa00'}});
                 }
             } else {
                 var constructSpawn = creep.room.find(FIND_CONSTRUCTION_SITES, {
@@ -125,7 +121,7 @@ var roleHarvesterRoom = {
                     creep.say("Building!");
                     creep.memory.building = true;
                     if (creep.build(constructSpawn[0]) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(constructSpawn[0]);
+                        creep.moveTo(constructSpawn[0], {visualizePathStyle: {stroke: '#ffffff'}});
                     }
                     if (creep.memory.building && creep.carry.energy == 0) {
                         creep.memory.building = false;
@@ -133,21 +129,22 @@ var roleHarvesterRoom = {
 
                 } else if(roomSpawn.length > 0) {
                     if (creep.transfer(roomSpawn[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(roomSpawn[0]);
+                        creep.moveTo(roomSpawn[0], {visualizePathStyle: {stroke: '#ffffff'}});
                     }
-                }
-
-                else {
+                    if (creep.memory.building && creep.carry.energy == 0) {
+                        creep.memory.building = false;
+                    }
+                } else {
                     creep.say("Homewards!");
-                    creep.moveTo(spawn[0]);
+                    creep.moveTo(spawn[0], {visualizePathStyle: {stroke: '#ffffff'}});
                 }
             }
         } else {
             if (creep.carry.energy < creep.carryCapacity) {
-                creep.moveTo(room_cur);
+                creep.moveTo(room_cur, {visualizePathStyle: {stroke: '#ffffff'}});
             } else {
                 creep.say("Homewards!");
-                creep.moveTo(spawn[0]);
+                creep.moveTo(spawn[0], {visualizePathStyle: {stroke: '#ffffff'}});
             }
         }
     }

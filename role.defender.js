@@ -17,11 +17,16 @@ var roleDefender = {
 //            creep.moveTo(flag); 
 
         if (hostiles.length > 0) {
+            creep.memory.timeToDeath = 0;
             var username = hostiles[0].owner.username;
             Game.notify(`User ${username} spotted in room ${hostiles[0].room}`);
             creep.moveTo(hostiles[0]);
             creep.attack(hostiles[0]);
         } else {
+            creep.memory.timeToDeath++;
+            if(creep.memory.timeToDeath >= 50) {
+                creep.suicide();
+            }
             if (creep.ticksToLive < 500 && !creep.memory.renew_process) {
                 //creep.moveTo(targets[0]);
                 creep.memory.renew_process = true;
