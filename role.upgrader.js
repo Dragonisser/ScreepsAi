@@ -30,22 +30,25 @@ var roleUpgrader = {
             var roomName = String(room_dest);
             creep.moveTo(new RoomPosition(25, 25, roomName));
         } else {
-            if (creep.memory.building && creep.carry.energy == 0) {
+            if (creep.memory.building && creep.store.energy == 0) {
                 creep.memory.building = false;
             }
             if (!creep.memory.building
-                && creep.carry.energy == creep.carryCapacity) {
+                && creep.carry.energy == creep.store.getCapacity()) {
                 creep.memory.building = true;
             }
 
             if (creep.memory.building) {
-                creep.say("⏏️")
+                creep.say("⏏");
                 if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(creep.room.controller, {visualizePathStyle: {stroke: '#00B200'}});
+                    creep.moveTo(creep.room.controller, {visualizePathStyle: {stroke: '#00B200'}, reusePath:10});
                 }
+                /*if (creep.signController(creep.room.controller, "Gebiet des Deutschen Kaiserreich") == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(creep.room.controller, {visualizePathStyle: {stroke: '#00B200'}});
+                }*/
             } else {
                 if (!creep.memory.renew_process) {
-                    creep.say("⛏︎")
+                    creep.say("⛏");
                     var sources = creep.pos.findClosestByPath(FIND_SOURCES);
                     if (creep.room.storage && creep.room.storage.store.energy > 10000) {
                         creep.moveTo(creep.room.storage, {visualizePathStyle: {stroke: '#ffaa00'}});

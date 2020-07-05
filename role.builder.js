@@ -43,7 +43,7 @@ var roleBuilder = {
 
             if (creep.memory.building) {
                 if (targets) {
-                    creep.say("🔨")
+                    creep.say("⛏")
                      
                     if (creep.build(targets) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(targets, {visualizePathStyle: {stroke: '#ffffff'}});
@@ -61,7 +61,7 @@ var roleBuilder = {
                         creep.moveTo(creep.room.storage, {visualizePathStyle: {stroke: '#ffaa00'}});
                     }
                 } else {
-                    creep.say("⛏︎")
+                    creep.say("⛏")
                     if (creep.harvest(sources) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(sources, {visualizePathStyle: {stroke: '#ffaa00'}});
                     }

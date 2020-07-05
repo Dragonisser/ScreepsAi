@@ -7,10 +7,12 @@ var structureTower = {
     run: function (roomName) {
 
         var hostiles = roomName.find(FIND_HOSTILE_CREEPS);
-
+        var today = new Date();
+        today.setHours(today.getHours() + 2);
+        
         if (hostiles.length > 0) {
             var username = hostiles[0].owner.username;
-            Game.notify(`User ${username} spotted in room ${roomName}`);
+            Game.notify(`User ${username} spotted in room ${hostiles[0].room} - ${today.toLocaleString()} - ${Game.time}`);
         }
 
         var tower = roomName.find(FIND_MY_STRUCTURES, {filter: {structureType: STRUCTURE_TOWER}});
@@ -23,6 +25,10 @@ var structureTower = {
                     
                     var closestDamagedStructure2 = tower[i].pos.findClosestByRange(FIND_STRUCTURES, {
                         filter: (structure) => structure.structureType == STRUCTURE_RAMPART ? structure.hits < 1500000 : (structure.hits < (structure.hitsMax < 1500000 ? structure.hitsMax : 1500000))
+                    });
+                    
+                    var closestDamagedStructure3 = tower[i].pos.findClosestByRange(FIND_STRUCTURES, {
+                        filter: (structure) => structure.structureType == STRUCTURE_RAMPART ? structure.hits < 5000000 : (structure.hits < (structure.hitsMax < 5000000 ? structure.hitsMax : 5000000))
                     });
 
                     if (closestDamagedStructure) {
@@ -37,10 +43,30 @@ var structureTower = {
                                 tower[i].repair(closestDamagedStructure2);
                             }
                         }
+                    } else if (closestDamagedStructure3) {
+                        if (closestDamagedStructure3.hits < (closestDamagedStructure3.hitsMax < 5000000 ? closestDamagedStructure3.hitsMax : 5000000)) {
+                            if (tower[i].energy > 500) {
+                                tower[i].repair(closestDamagedStructure3);
+                            }
+                        }
                     }
+                } else if (tower[i].energy > 200 && hostiles.length == 0) {
+                    var closestDamagedStructure = tower[i].pos.findClosestByRange(FIND_STRUCTURES, {
+                        filter: (structure) => structure.structureType == STRUCTURE_RAMPART && structure.hits < 25000
+                    });
+                    tower[i].repair(closestDamagedStructure);
                 }
                 var closestHostile = tower[i].pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+                var creepsHostile = tower[i].room.find(FIND_HOSTILE_CREEPS);
+                var healingCreep;
+                //for (i = 0; i < creepsHostile.length; i++) {
+                    //console.log(_.filter(creepsHostile[i].body, function(bp){return bp == MOVE;}).length)
+                //}
+                
+                //
+                
                 if (closestHostile) {
+                    
                     tower[i].attack(closestHostile);
                 }
             }

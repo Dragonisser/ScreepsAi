@@ -22,7 +22,7 @@ var structureLink = {
                 if (closesToStructure == "") {
                     closesToStructure = links[x]
                 } else {
-                    console.log(spawn[0].pos + " " + links[x].pos + " " + closesToStructure.pos)
+                    //console.log(spawn[0].pos + " " + links[x].pos + " " + closesToStructure.pos)
                     if (PathFinder.search(spawn[0].pos, links[x].pos).cost < PathFinder.search(spawn[0].pos, closesToStructure.pos).cost) {
                         closesToStructure = links[x]
                     }

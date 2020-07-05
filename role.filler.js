@@ -82,26 +82,34 @@ var roleFiller = {
                 for (var y = 0; y < links.length; y++) {
                     cost1 = PathFinder.search(spawn[0].pos, links[y].pos).cost;
                     //console.log(cost1 + " " + oldCost1)
-                    if (cost1 < oldCost1 && links[y].energy >= 200) {
+                    if (cost1 < oldCost1 && links[y].energy >= creep.carryCapacity) {
                         oldCost1 = cost1;
                         closesToStructure = links[y];
                         //console.log(closestoSpawn + " " + spawn[0].room)
                     }
                 }
             }
+            var storageFull;
+            if(creep.room.storage != undefined) {
+                storageFull = _.sum(creep.room.storage.store) == creep.room.storage.storeCapacity;
+            }
             
-            var storageFull = _.sum(creep.room.storage.store) == creep.room.storage.storeCapacity;
             
-            dontPickUp = false
+            dontPickUp = false;
             if (droppedRessource != null && (droppedRessource.pos.x == 48 || droppedRessource.pos.y == 48 || droppedRessource.pos.y == 49 || droppedRessource.pos.x == 49  || droppedRessource.pos.y == 0 || droppedRessource.pos.x == 0 || droppedRessource.pos.y == 1 || droppedRessource.pos.x == 1)) {
                 dontPickUp = true
             }
+            dontPickupTombstone = false;
+            if (tombstone != null && (tombstone.pos.x == 48 || tombstone.pos.y == 48 || tombstone.pos.y == 49 || tombstone.pos.x == 49  || tombstone.pos.y == 0 || tombstone.pos.x == 0 || tombstone.pos.y == 1 || tombstone.pos.x == 1)) {
+                dontPickupTombstone = true
+            }
+            
             
             if (!creep.memory.renew_process) {
                if (droppedRessource && !dontPickUp && creep.moveTo(droppedRessource) != ERR_NO_PATH && !storageFull) {
                     creep.moveTo(droppedRessource, {visualizePathStyle: {stroke: '#ffaa00'}})
                     creep.pickup(droppedRessource);
-                } else if (tombstone && creep.moveTo(tombstone) != ERR_NO_PATH && !storageFull) {
+                } else if (tombstone && !dontPickupTombstone && creep.moveTo(tombstone) != ERR_NO_PATH && !storageFull) {
                     creep.moveTo(tombstone, {visualizePathStyle: {stroke: '#ffaa00'}});
                     for(const resourceType in tombstone.store) {
                         creep.withdraw(tombstone, resourceType);

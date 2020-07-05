@@ -59,15 +59,15 @@ var roleHarvesterRoom = {
 
         if (creep.room == Game.rooms[room_spawn]) {
 
-            if (creep.memory.building && creep.carry.energy == 0) {
+            if (creep.memory.building && creep.store.energy == 0) {
                 creep.memory.building = false;
             }
 
-            if (!creep.memory.building && creep.carry.energy == creep.carryCapacity) {
+            if (!creep.memory.building && creep.store.energy == creep.storeCapacity) {
                 creep.memory.building = true;
             }
 
-            if (creep.carry.energy == 0) {
+            if (creep.store.energy == 0) {
                 //console.log(room_cur)
                 creep.moveTo(room_cur);
             } else {
@@ -99,7 +99,7 @@ var roleHarvesterRoom = {
                 }
             }
         } else if (creep.room == Game.rooms[room_dest]) {
-            if (creep.carry.energy < creep.carryCapacity && !creep.memory.building) {
+            if (creep.store.energy < creep.store.getCapacity() && !creep.memory.building) {
                 creep.say("⛏︎")
                 var sources = creep.pos.findClosestByPath(FIND_SOURCES);
                 if (creep.harvest(sources) == ERR_NOT_IN_RANGE) {
@@ -123,7 +123,7 @@ var roleHarvesterRoom = {
                     if (creep.build(constructSpawn[0]) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(constructSpawn[0], {visualizePathStyle: {stroke: '#ffffff'}});
                     }
-                    if (creep.memory.building && creep.carry.energy == 0) {
+                    if (creep.memory.building && creep.store.energy == 0) {
                         creep.memory.building = false;
                     }
 
@@ -131,7 +131,7 @@ var roleHarvesterRoom = {
                     if (creep.transfer(roomSpawn[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(roomSpawn[0], {visualizePathStyle: {stroke: '#ffffff'}});
                     }
-                    if (creep.memory.building && creep.carry.energy == 0) {
+                    if (creep.memory.building && creep.store.energy == 0) {
                         creep.memory.building = false;
                     }
                 } else {
@@ -140,7 +140,7 @@ var roleHarvesterRoom = {
                 }
             }
         } else {
-            if (creep.carry.energy < creep.carryCapacity) {
+            if (creep.store.energy < creep.store.getCapacity()) {
                 creep.moveTo(room_cur, {visualizePathStyle: {stroke: '#ffffff'}});
             } else {
                 creep.say("Homewards!");
