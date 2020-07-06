@@ -35,51 +35,52 @@ var spawnCreeps = {
     },
     spawnHarvesterExternal: function (spawn, roomDestination, creepsSpawned, creepsNeeded, dependingCreepsSpawned) {
         "use strict";
-        var roomConstruct = Game.rooms[rooms_around[x]];
+        var roomConstruct = Game.rooms[roomDestination.room_name];
         var constructSpawn;
-        if (roomConstruct != undefined) {
+        if (roomConstruct !== undefined) {
             constructSpawn = roomConstruct.find(FIND_CONSTRUCTION_SITES, {
                 filter: (structure) => {
-                    return structure.structureType == STRUCTURE_SPAWN;
+                    return structure.structureType === STRUCTURE_SPAWN;
                 }
             });
         }
-        if (roomConstruct == undefined || constructSpawn.length > 0) {
-            if (spawn.room.name == route_spawnroom_name && room_Harvesters_room.length < harvester_room_spawn) {
+
+        if (roomConstruct === undefined || constructSpawn.length > 0) {
+            if (creepsSpawned < creepsNeeded) {
                 if (spawn.room.energyAvailable >= 850) {
-                    var number = Math.floor(Math.random() * (room_Harvesters_room.length + 1));
-                    if (spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], "Harvester_Ex_" + rooms_around[x] + number, {dryRun: true}) == 0) {
-                        var creep = spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], "Harvester_Ex_" + rooms_around[x] + "_" + number, {
+                    var number = Math.floor(Math.random() * (creepsSpawned + 1));
+                    if (spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], "Harvester_Ex_" + roomDestination.room_name + number, {dryRun: true}) === 0) {
+                        var creep = spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], "Harvester_Ex_" + roomDestination.room_name + "_" + number, {
                             memory: {
                                 role: 'harvester_external',
-                                room_dest: rooms_around[x],
-                                room_spawn: room.name,
+                                room_dest: roomDestination.room_name,
+                                room_spawn: spawn.room.name,
                                 flag_dest_x: '25',
                                 flag_dest_y: '25'
                             }
                         });
                     }
                 } else if (spawn.room.energyAvailable >= 650) {
-                    var number = Math.floor(Math.random() * (room_Harvesters_room.length + 1));
-                    if (spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], "Harvester_Ex_" + rooms_around[x] + number, {dryRun: true}) == 0) {
-                        var creep = spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], "Harvester_Ex_" + rooms_around[x] + "_" + number, {
+                    var number = Math.floor(Math.random() * (creepsSpawned + 1));
+                    if (spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], "Harvester_Ex_" + roomDestination.room_name + number, {dryRun: true}) === 0) {
+                        var creep = spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], "Harvester_Ex_" + roomDestination.room_name + "_" + number, {
                             memory: {
                                 role: 'harvester_external',
-                                room_dest: rooms_around[x],
-                                room_spawn: room.name,
+                                room_dest: roomDestination.room_name,
+                                room_spawn: spawn.room.name,
                                 flag_dest_x: '25',
                                 flag_dest_y: '25'
                             }
                         });
                     }
                 } else {
-                    var number = Math.floor(Math.random() * (room_Harvesters_room.length + 1));
-                    if (spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE], "Harvester_Ex_" + rooms_around[x] + number, {dryRun: true}) == 0) {
-                        var creep = spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE], "Harvester_Ex_" + rooms_around[x] + "_" + number, {
+                    var number = Math.floor(Math.random() * (creepsSpawned + 1));
+                    if (spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE], "Harvester_Ex_" + roomDestination.room_name + number, {dryRun: true}) === 0) {
+                        var creep = spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE], "Harvester_Ex_" + roomDestination.room_name + "_" + number, {
                             memory: {
                                 role: 'harvester_external',
-                                room_dest: rooms_around[x],
-                                room_spawn: room.name,
+                                room_dest: roomDestination.room_name,
+                                room_spawn: spawn.room.name,
                                 flag_dest_x: '25',
                                 flag_dest_y: '25'
                             }
@@ -238,9 +239,9 @@ var spawnCreeps = {
         } else {
             creepsNeeded = 0
         }
-        if (creepsSpawned.length < creepsNeeded) {
-            if (room.energyAvailable >= 650) {
-                var number = Math.floor(Math.random() * (room_Fillers.length + 1));
+        if (creepsSpawned < creepsNeeded) {
+            if (spawn.room.energyAvailable >= 650) {
+                var number = Math.floor(Math.random() * (creepsSpawned + 1));
                 if (spawn.spawnCreep([CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], "Filler_" + roomDestination.name + "_" + number, {dryRun: true}) == 0) {
                     var creep = spawn.spawnCreep([CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], "Filler_" + roomDestination.name + "_" + number, {
                         memory: {
@@ -251,7 +252,7 @@ var spawnCreeps = {
                 }
 
             } else {
-                var number = Math.floor(Math.random() * (room_Fillers.length + 1));
+                var number = Math.floor(Math.random() * (creepsSpawned + 1));
                 if (spawn.spawnCreep([CARRY, CARRY, CARRY, CARRY, MOVE, MOVE], "Filler_" + roomDestination.name + "_" + number, {dryRun: true}) == 0) {
                     var creep = spawn.spawnCreep([CARRY, CARRY, CARRY, CARRY, MOVE, MOVE], "Filler_" + roomDestination.name + "_" + number, {
                         memory: {

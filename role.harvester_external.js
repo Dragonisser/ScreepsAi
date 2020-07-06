@@ -59,11 +59,11 @@ var roleHarvesterRoom = {
 
         if (creep.room == Game.rooms[room_spawn]) {
 
-            if (creep.memory.building && creep.store.energy == 0) {
+            if (creep.memory.building && creep.store.energy === 0) {
                 creep.memory.building = false;
             }
 
-            if (!creep.memory.building && creep.store.energy == creep.storeCapacity) {
+            if (!creep.memory.building && creep.store.energy === creep.store.getCapacity()) {
                 creep.memory.building = true;
             }
 

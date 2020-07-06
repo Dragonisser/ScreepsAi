@@ -15,11 +15,10 @@ var roleFiller = {
             }
         });
 
-        if (creep.memory.building && _.sum(creep.carry) == 0) {
+        if (creep.memory.building && creep.store.energy == 0) {
             creep.memory.building = false;
         }
-        if (!creep.memory.building
-            && _.sum(creep.carry) == creep.carryCapacity) {
+        if (!creep.memory.building && creep.store.energy == creep.store.getCapacity()) {
             creep.memory.building = true;
         }
         
@@ -48,22 +47,22 @@ var roleFiller = {
         var targetTower = creep.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: (structure) => {
                 return structure.structureType == STRUCTURE_TOWER &&
-                    structure.energy < structure.energyCapacity;
+                    structure.energy < structure.energyCapacity * 0.75;
             }
         });
 
         if (creep.memory.building) {
-            if (targets && creep.carry.energy > 0 && creep.room.energyAvailable > creep.room.energyAvailable / 2) {
+            if (targets && creep.store.energy > 0 && creep.room.energyAvailable > creep.room.energyAvailable / 2) {
                 if (creep.transfer(targets, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(targets, {visualizePathStyle: {stroke: '#ffffff'}});
                 }
-            } else if(targetTower && creep.carry.energy > 0) {
+            } else if(targetTower && creep.store.energy > 0) {
                 if (creep.transfer(targetTower, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(targetTower, {visualizePathStyle: {stroke: '#ffffff'}});
                 }
-            } else if(creep.room.storage && _.sum(creep.room.storage.store) < creep.room.storage.storeCapacity) {
+            } else if(creep.room.storage && creep.room.storage.store.getUsedCapacity() < creep.room.storage.store.getCapacity()) {
                 var storage = creep.room.storage;
-                for(const resourceType in creep.carry) {
+                for(const resourceType in creep.store) {
                     if (creep.transfer(storage, resourceType) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(storage, {visualizePathStyle: {stroke: '#ffffff'}});
                     }
@@ -91,7 +90,7 @@ var roleFiller = {
             }
             var storageFull;
             if(creep.room.storage != undefined) {
-                storageFull = _.sum(creep.room.storage.store) == creep.room.storage.storeCapacity;
+                storageFull = creep.room.storage.store.getUsedCapacity() == creep.room.storage.store.getCapacity();
             }
             
             

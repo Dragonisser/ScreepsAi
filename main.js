@@ -18,7 +18,7 @@ var structureTower = require('structure.tower');
 var structureLink = require('structure.link');
 
 var harvester_spawn = 3;
-var harvester_room_spawn = 4;
+var harvester_external_spawn = 4;
 var harvester_mineral_spawn = 1;
 var upgrader_spawn = 3;
 var builder_spawn = 0;
@@ -82,7 +82,7 @@ module.exports.loop = function () {
             roleLib.spawnHarvester(spawn, room, room_Harvesters.length, harvester_spawn, 0);
 
             //HARVESTER_EXTERNAL
-            //roleLib.spawnHarvesterExternal();
+            roleLib.spawnHarvesterExternal(spawn, mapRooms[x], role_Harvesters_External.length, harvester_external_spawn, 0);
 
             //HARVESTER_MINERAL
             //roleLib.spawnHarvesterMinderal();
@@ -97,7 +97,7 @@ module.exports.loop = function () {
             //roleLib.spawnClaimer();
 
             //FILLER
-            //roleLib.spawnFiller();
+            roleLib.spawnFiller(spawn, room, room_Fillers.length, filler_spawn, room_Harvesters.length);
         }
 
         //EXPLORER
@@ -125,7 +125,7 @@ module.exports.loop = function () {
             case 'harvester':
                 roleHarvester.run(creep);
                 break;
-            case 'harvester_room':
+            case 'harvester_external':
                 roleHarvesterExternal.run(creep);
                 break;
             case 'harvester_mineral':

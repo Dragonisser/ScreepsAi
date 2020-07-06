@@ -60,7 +60,11 @@ var roleUpgrader = {
                     if (creep.moveTo(spawn[0]) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(spawn[0], {visualizePathStyle: {stroke: '#ffffff'}});
                     } else {
-                        spawn[0].renewCreep(creep)
+                        if (creep.room.energyAvailable > 500) {
+                            creep.suicide();
+                        } else {
+                            spawn[0].renewCreep(creep)
+                        }
                     }
                 }
             }

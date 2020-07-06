@@ -19,6 +19,10 @@ var structureTower = {
         if (tower) {
             for (i = 0; i < tower.length; i++) {
                 if (tower[i].energy > 500 && roomName.energyAvailable > 500 && hostiles.length == 0) {
+                    var initialDamagedStructure = tower[i].pos.findClosestByRange(FIND_STRUCTURES, {
+                        filter: (structure) => structure.structureType == STRUCTURE_RAMPART ? structure.hits < 5000 : (structure.hits < (structure.hitsMax <5000 ? structure.hitsMax : 5000))
+                    });
+
                     var closestDamagedStructure = tower[i].pos.findClosestByRange(FIND_STRUCTURES, {
                         filter: (structure) => structure.structureType == STRUCTURE_RAMPART ? structure.hits < 50000 : (structure.hits < (structure.hitsMax < 50000 ? structure.hitsMax : 50000))
                     });
@@ -31,7 +35,13 @@ var structureTower = {
                         filter: (structure) => structure.structureType == STRUCTURE_RAMPART ? structure.hits < 5000000 : (structure.hits < (structure.hitsMax < 5000000 ? structure.hitsMax : 5000000))
                     });
 
-                    if (closestDamagedStructure) {
+                    if (initialDamagedStructure) {
+                        if (initialDamagedStructure.hits < (initialDamagedStructure.hitsMax < 5000 ? initialDamagedStructure.hitsMax : 5000)) {
+                            if (tower[i].energy > 500) {
+                                tower[i].repair(initialDamagedStructure);
+                            }
+                        }
+                    } else if (closestDamagedStructure) {
                         if (closestDamagedStructure.hits < (closestDamagedStructure.hitsMax < 50000 ? closestDamagedStructure.hitsMax : 50000)) {
                             if (tower[i].energy > 500) {
                                 tower[i].repair(closestDamagedStructure);
@@ -66,7 +76,6 @@ var structureTower = {
                 //
                 
                 if (closestHostile) {
-                    
                     tower[i].attack(closestHostile);
                 }
             }
