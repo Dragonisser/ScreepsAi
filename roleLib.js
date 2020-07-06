@@ -17,7 +17,7 @@ var spawnCreeps = {
                     var creep = spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], "Harvester_" + room.name + "_" + number, {
                         memory: {
                             role: 'harvester',
-                            room_destination: room.name
+                            room_dest: room.name
                         }
                     });
                 }
@@ -26,7 +26,7 @@ var spawnCreeps = {
                     var creep = spawn.spawnCreep([WORK, CARRY, MOVE], "Harvester_" + room.name + "_" + number, {
                         memory: {
                             role: 'harvester',
-                            room_destination: room.name
+                            room_dest: room.name
                         }
                     });
                 }
@@ -132,7 +132,7 @@ var spawnCreeps = {
         if (controllerLevel < 8) {
             creepsNeeded = 3;
         } else {
-            creepsNeeded = 2;
+            creepsNeeded = 1;
         }
         if (creepsSpawned < creepsNeeded && dependingCreepsSpawned > 0) {
             var number = Math.floor(Math.random() * (creepsSpawned + 1));
@@ -141,7 +141,7 @@ var spawnCreeps = {
                     var creep = spawn.spawnCreep([WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], "Upgrader_" + room.name + "_" + number, {
                         memory: {
                             role: 'upgrader',
-                            room_destination: room.name,
+                            room_dest: room.name,
                             cLevel: '3'
                         }
                     });
@@ -151,7 +151,7 @@ var spawnCreeps = {
                     var creep = spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE], "Upgrader_" + room.name + "_" + number, {
                         memory: {
                             role: 'upgrader',
-                            room_destination: room.name,
+                            room_dest: room.name,
                             cLevel: '2'
                         }
                     });
@@ -161,7 +161,7 @@ var spawnCreeps = {
                     var creep = spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE], "Upgrader_" + room.name + "_" + number, {
                         memory: {
                             role: 'upgrader',
-                            room_destination: room.name,
+                            room_dest: room.name,
                             cLevel: '1'
                         }
                     });
@@ -171,7 +171,7 @@ var spawnCreeps = {
                     var creep = spawn.spawnCreep([WORK, CARRY, MOVE], "Upgrader_" + room.name + "_" + number, {
                         memory: {
                             role: 'upgrader',
-                            room_destination: room.name,
+                            room_dest: room.name,
                             cLevel: '0'
                         }
                     });
@@ -191,6 +191,7 @@ var spawnCreeps = {
         } else {
             creepsNeeded = 0
         }
+
         if (creepsSpawned < creepsNeeded && dependingCreepsSpawned > 0) {
             var number = Math.floor(Math.random() * (creepsSpawned + 1));
             if (roomDestination.energyAvailable >= 1200) {

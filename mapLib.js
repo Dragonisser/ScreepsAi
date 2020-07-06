@@ -1,9 +1,9 @@
-var mapLibFunctions = {
+let mapLibFunctions = {
 
     addToRoomList: function (roomName, roomClaimable) {
         "use strict";
 
-        var mapRooms = this.getRoomList();
+        let mapRooms = this.getRoomList();
         //console.log(mapRooms.includes(roomName));
         //console.log(mapRooms.indexOf(roomName));
         //console.log(mapRooms.filter(room_name => mapRooms.room_name === roomName));
@@ -19,7 +19,7 @@ var mapLibFunctions = {
     },
     removeFromRoomList: function (roomName) {
         "use strict";
-        var mapRooms = this.getRoomList();
+        let mapRooms = this.getRoomList();
         const index = mapRooms.indexOf(roomName);
         if (index > -1) {
             mapRooms.splice(index, 1);
@@ -67,8 +67,6 @@ var mapLibFunctions = {
         "use strict";
         Memory.roomList = roomList;
     }
-
-
 };
 
 module.exports = mapLibFunctions;
