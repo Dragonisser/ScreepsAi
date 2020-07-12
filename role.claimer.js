@@ -1,31 +1,27 @@
 var roleClaimer = {
 
-    /**
-     * @param {Creep}
-     *            creep *
-     */
     run: function (creep) {
         
         var room_dest;
-        if (creep.memory.room_dest != undefined) {
+        if (creep.memory.room_dest !== undefined) {
             room_dest = creep.memory.room_dest;
         } else {
             Game.notify('Claimer has no destination');
         }
         var room = creep.room;
         var targets = creep.room.find(FIND_STRUCTURES, {
-            filter: (structure) => {return structure.structureType == STRUCTURE_CONTROLLER;
+            filter: (structure) => {return structure.structureType === STRUCTURE_CONTROLLER;
             }
         })
         var spawn = creep.room.find(FIND_STRUCTURES, {
             filter: (structure) => {
-                return structure.structureType == STRUCTURE_SPAWN;
+                return structure.structureType === STRUCTURE_SPAWN;
             }
         })
 
         //console.log(creep.name + " " + targets)
 
-        if (creep.memory.room_dest != undefined && creep.room.name != room_dest) {
+        if (creep.memory.room_dest !== undefined && creep.room.name !== room_dest) {
             room_dest = creep.memory.room_dest;
             var roomName = String(room_dest);
             creep.moveTo(new RoomPosition(25, 25, roomName), {visualizePathStyle: {stroke: '#0000FF'}});
@@ -33,41 +29,41 @@ var roleClaimer = {
             creep.moveTo(targets[0], {visualizePathStyle: {stroke: '#0000FF'}});
             //creep.reserveController(targets[0]);
             if (room.controller != null) {
-                if (!room.controller.my && room.controller.owner == undefined) {
-                    creep.say("")
+                if (!room.controller.my && room.controller.owner === undefined) {
                     creep.claimController(targets[0]);
-                } else if (room.controller.owner != undefined && room.controller.owner.username != "Dragonisser") {
+                } else if (room.controller.owner !== undefined && room.controller.owner.username !== "Dragonisser") {
                     creep.attackController(targets[0]);
                 } else if (room.controller.my) {
                     var constructSpawn = creep.room.find(FIND_CONSTRUCTION_SITES, {
                         filter: (structure) => {
-                            return structure.structureType == STRUCTURE_SPAWN && structure.my;
+                            return structure.structureType === STRUCTURE_SPAWN && structure.my;
                         }
                     });
-                    if (constructSpawn.length == 0) {
-                        //const terrain = creep.room.getTerrain();
-                        //console.log("Spawn in room missing " + room.name)
-                        
-                        /*for (var x = -10; x < 10; x++) {
-                            for (var y = -10; y < 10; y++) {
-                                //console.log("x: " + (25 + x) + " - y: " + (25 + y))
-                                var canBuild = true;
-                                for (var j = -2; j < 2; j++) {
-                                    for (var k = -2; k < 2; k++) {
-                                        //console.log("x: " + (25 + x) + " - y: " + (25 + y))
-                                        //if (terrain.get(25+j,25+k) == TERRAIN_MASK_WALL) {
-                                        //    canBuild = false;
-                                        //}
-                                    }
-                                }
-                                if (canBuild) {
-                                    //room.createConstructionSite(x, y, STRUCTURE_SPAWN);
-                                }
-                            }
-                        }*/
+                    if (constructSpawn.length === 0) {
+                        // const terrain = creep.room.getTerrain();
+                        // console.log("Spawn in room missing " + room.name);
+
+                        //TODO Fix that, kills screeps.
+                        // for (var x = -10; x < 10; x++) {
+                        //     for (var y = -10; y < 10; y++) {
+                        //         //console.log("x: " + (25 + x) + " - y: " + (25 + y))
+                        //         var canBuild = false;
+                        //         /*for (var j = -2; j < 2; j++) {
+                        //             for (var k = -2; k < 2; k++) {
+                        //                 //console.log("x: " + (25 + x) + " - y: " + (25 + y))
+                        //                 if (terrain.get(25+j,25+k) == TERRAIN_MASK_WALL) {
+                        //                     canBuild = false;
+                        //                 }
+                        //             }
+                        //         }*/
+                        //         if (canBuild) {
+                        //             room.createConstructionSite(x, y, STRUCTURE_SPAWN);
+                        //         }
+                        //     }
+                        // }
                         
                     }
-                    //creep.suicide();
+                    creep.suicide();
                 }
             }
 
@@ -85,7 +81,7 @@ var roleClaimer = {
                 try {
                     var ticks = creep.ticksToLive;
                     targets[0].renewCreep(creep);
-                    if (ticks == creep.ticksToLive) {
+                    if (ticks === creep.ticksToLive) {
                         creep.move(TOP);
                         creep.moveTo(targets[0]);
                     }

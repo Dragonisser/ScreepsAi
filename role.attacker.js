@@ -1,22 +1,16 @@
 var roleDefender = {
 
-    /**
-     * @param {Creep}
-     *            creep *
-     */
     run: function (creep) {
-
-        var room = creep.room;
         var hostile = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
         var tower = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {
             filter: (structure) => {
-            return structure.structureType == STRUCTURE_TOWER;
+            return structure.structureType === STRUCTURE_TOWER;
              }
         });
         var spawn = creep.pos.findClosestByPath(FIND_HOSTILE_SPAWNS);
         var structure = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {
             filter: (structure) => {
-            return structure.structureType != STRUCTURE_CONTROLLER;
+            return structure.structureType !== STRUCTURE_CONTROLLER;
              }
         });
                 

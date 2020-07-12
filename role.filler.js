@@ -1,9 +1,5 @@
 var roleFiller = {
 
-    /**
-     * @param {Creep}
-     *            creep *
-     */
     run: function (creep) {
         
         //creep.drop(RESOURCE_LEMERGIUM)
@@ -11,14 +7,14 @@ var roleFiller = {
         var closesToStructure = ""
         var spawn = creep.room.find(FIND_STRUCTURES, {
             filter: (structure) => {
-                return structure.structureType == STRUCTURE_SPAWN
+                return structure.structureType === STRUCTURE_SPAWN
             }
         });
 
-        if (creep.memory.building && creep.store.energy == 0) {
+        if (creep.memory.building && creep.store.energy === 0) {
             creep.memory.building = false;
         }
-        if (!creep.memory.building && creep.store.energy == creep.store.getCapacity()) {
+        if (!creep.memory.building && creep.store.energy === creep.store.getCapacity()) {
             creep.memory.building = true;
         }
         
@@ -40,30 +36,30 @@ var roleFiller = {
         
         var targets = creep.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: (structure) => {
-                return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN ) &&
+                return (structure.structureType === STRUCTURE_EXTENSION || structure.structureType === STRUCTURE_SPAWN ) &&
                     structure.energy < structure.energyCapacity;
             }
         });
         var targetTower = creep.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: (structure) => {
-                return structure.structureType == STRUCTURE_TOWER &&
+                return structure.structureType === STRUCTURE_TOWER &&
                     structure.energy < structure.energyCapacity * 0.75;
             }
         });
 
         if (creep.memory.building) {
             if (targets && creep.store.energy > 0 && creep.room.energyAvailable > creep.room.energyAvailable / 2) {
-                if (creep.transfer(targets, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                if (creep.transfer(targets, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
                     creep.moveTo(targets, {visualizePathStyle: {stroke: '#ffffff'}});
                 }
             } else if(targetTower && creep.store.energy > 0) {
-                if (creep.transfer(targetTower, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                if (creep.transfer(targetTower, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
                     creep.moveTo(targetTower, {visualizePathStyle: {stroke: '#ffffff'}});
                 }
             } else if(creep.room.storage && creep.room.storage.store.getUsedCapacity() < creep.room.storage.store.getCapacity()) {
                 var storage = creep.room.storage;
                 for(const resourceType in creep.store) {
-                    if (creep.transfer(storage, resourceType) == ERR_NOT_IN_RANGE) {
+                    if (creep.transfer(storage, resourceType) === ERR_NOT_IN_RANGE) {
                         creep.moveTo(storage, {visualizePathStyle: {stroke: '#ffffff'}});
                     }
                 }
@@ -71,7 +67,7 @@ var roleFiller = {
         } else {
             var links = creep.room.find(FIND_STRUCTURES, {
                 filter: (structure) => {
-                    return structure.structureType == STRUCTURE_LINK;
+                    return structure.structureType === STRUCTURE_LINK;
                 }
             });
             
@@ -89,26 +85,26 @@ var roleFiller = {
                 }
             }
             var storageFull;
-            if(creep.room.storage != undefined) {
-                storageFull = creep.room.storage.store.getUsedCapacity() == creep.room.storage.store.getCapacity();
+            if(creep.room.storage !== undefined) {
+                storageFull = creep.room.storage.store.getUsedCapacity() === creep.room.storage.store.getCapacity();
             }
             
             
-            dontPickUp = false;
-            if (droppedRessource != null && (droppedRessource.pos.x == 48 || droppedRessource.pos.y == 48 || droppedRessource.pos.y == 49 || droppedRessource.pos.x == 49  || droppedRessource.pos.y == 0 || droppedRessource.pos.x == 0 || droppedRessource.pos.y == 1 || droppedRessource.pos.x == 1)) {
+            let dontPickUp = false;
+            if (droppedRessource != null && (droppedRessource.pos.x === 48 || droppedRessource.pos.y === 48 || droppedRessource.pos.y === 49 || droppedRessource.pos.x === 49  || droppedRessource.pos.y === 0 || droppedRessource.pos.x === 0 || droppedRessource.pos.y === 1 || droppedRessource.pos.x === 1)) {
                 dontPickUp = true
             }
-            dontPickupTombstone = false;
-            if (tombstone != null && (tombstone.pos.x == 48 || tombstone.pos.y == 48 || tombstone.pos.y == 49 || tombstone.pos.x == 49  || tombstone.pos.y == 0 || tombstone.pos.x == 0 || tombstone.pos.y == 1 || tombstone.pos.x == 1)) {
+            let dontPickupTombstone = false;
+            if (tombstone != null && (tombstone.pos.x === 48 || tombstone.pos.y === 48 || tombstone.pos.y === 49 || tombstone.pos.x === 49  || tombstone.pos.y === 0 || tombstone.pos.x === 0 || tombstone.pos.y === 1 || tombstone.pos.x === 1)) {
                 dontPickupTombstone = true
             }
             
             
             if (!creep.memory.renew_process) {
-               if (droppedRessource && !dontPickUp && creep.moveTo(droppedRessource) != ERR_NO_PATH && !storageFull) {
+               if (droppedRessource && !dontPickUp && creep.moveTo(droppedRessource) !== ERR_NO_PATH && !storageFull) {
                     creep.moveTo(droppedRessource, {visualizePathStyle: {stroke: '#ffaa00'}})
                     creep.pickup(droppedRessource);
-                } else if (tombstone && !dontPickupTombstone && creep.moveTo(tombstone) != ERR_NO_PATH && !storageFull) {
+                } else if (tombstone && !dontPickupTombstone && creep.moveTo(tombstone) !== ERR_NO_PATH && !storageFull) {
                     creep.moveTo(tombstone, {visualizePathStyle: {stroke: '#ffaa00'}});
                     for(const resourceType in tombstone.store) {
                         creep.withdraw(tombstone, resourceType);
@@ -121,7 +117,7 @@ var roleFiller = {
                     creep.withdraw(creep.room.storage, RESOURCE_ENERGY);
                 }   
             } else {
-                if (creep.moveTo(spawn[0]) == ERR_NOT_IN_RANGE) {
+                if (creep.moveTo(spawn[0]) === ERR_NOT_IN_RANGE) {
                     creep.moveTo(spawn[0], {visualizePathStyle: {stroke: '#ffffff'}});
                 } else {
                     spawn[0].renewCreep(creep)

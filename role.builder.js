@@ -1,9 +1,5 @@
 var roleBuilder = {
 
-    /**
-     * @param {Creep}
-     *            creep *
-     */
     run: function (creep) {
 
         let targets;
@@ -17,13 +13,13 @@ var roleBuilder = {
         
         let targetEnergy = creep.pos.findClosestByPath(FIND_STRUCTURES, {
              filter: (structure) => {
-                return (structure.structureType == STRUCTURE_LINK || structure.structureType == STRUCTURE_TOWER || structure.structureType == STRUCTURE_SPAWN ||
-                    structure.structureType == STRUCTURE_EXTENSION) &&
+                return (structure.structureType === STRUCTURE_LINK || structure.structureType === STRUCTURE_TOWER || structure.structureType === STRUCTURE_SPAWN ||
+                    structure.structureType === STRUCTURE_EXTENSION) &&
                     structure.energy < structure.energyCapacity;
                 }
         });
 
-        if (creep.memory.room_dest != null && creep.room.name != creep.memory.room_dest) {
+        if (creep.memory.room_dest != null && creep.room.name !== creep.memory.room_dest) {
             room_dest = creep.memory.room_dest;
             var roomName = String(room_dest);
             creep.moveTo(new RoomPosition(25, 25, roomName));
@@ -38,7 +34,6 @@ var roleBuilder = {
             if (creep.memory.building) {
                 if (targets !== undefined) {
                     creep.say("⛏")
-                     
                     if (creep.build(targets) === ERR_NOT_IN_RANGE) {
                         creep.moveTo(targets, {visualizePathStyle: {stroke: '#ffffff'}});
                     }
@@ -50,13 +45,13 @@ var roleBuilder = {
             } else {
                 var sources = creep.pos.findClosestByPath(FIND_SOURCES);
 
-                if ((creep.room.energyAvailable > 300 && targets && creep.room.storage != undefined) && creep.room.storage.store[RESOURCE_ENERGY] > 0) {
-                    if (creep.withdraw(creep.room.storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                if ((creep.room.energyAvailable > 300 && targets && creep.room.storage !== undefined) && creep.room.storage.store[RESOURCE_ENERGY] > 0) {
+                    if (creep.withdraw(creep.room.storage, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
                         creep.moveTo(creep.room.storage, {visualizePathStyle: {stroke: '#ffaa00'}});
                     }
                 } else {
                     creep.say("⛏")
-                    if (creep.harvest(sources) == ERR_NOT_IN_RANGE) {
+                    if (creep.harvest(sources) === ERR_NOT_IN_RANGE) {
                         creep.moveTo(sources, {visualizePathStyle: {stroke: '#ffaa00'}});
                     }
                 }

@@ -1,9 +1,5 @@
 var structureTower = {
 
-    /**
-     * @param {Room}
-     *            roomName *
-     */
     run: function (roomName) {
 
         var hostiles = roomName.find(FIND_HOSTILE_CREEPS);
@@ -18,21 +14,21 @@ var structureTower = {
         var tower = roomName.find(FIND_MY_STRUCTURES, {filter: {structureType: STRUCTURE_TOWER}});
         if (tower) {
             for (i = 0; i < tower.length; i++) {
-                if (tower[i].energy > 500 && roomName.energyAvailable > 500 && hostiles.length == 0) {
+                if (tower[i].energy > 500 && roomName.energyAvailable > 500 && hostiles.length === 0) {
                     var initialDamagedStructure = tower[i].pos.findClosestByRange(FIND_STRUCTURES, {
-                        filter: (structure) => structure.structureType == STRUCTURE_RAMPART ? structure.hits < 5000 : (structure.hits < (structure.hitsMax <5000 ? structure.hitsMax : 5000))
+                        filter: (structure) => structure.structureType === STRUCTURE_RAMPART ? structure.hits < 5000 : (structure.hits < (structure.hitsMax <5000 ? structure.hitsMax : 5000))
                     });
 
                     var closestDamagedStructure = tower[i].pos.findClosestByRange(FIND_STRUCTURES, {
-                        filter: (structure) => structure.structureType == STRUCTURE_RAMPART ? structure.hits < 50000 : (structure.hits < (structure.hitsMax < 50000 ? structure.hitsMax : 50000))
+                        filter: (structure) => structure.structureType === STRUCTURE_RAMPART ? structure.hits < 50000 : (structure.hits < (structure.hitsMax < 50000 ? structure.hitsMax : 50000))
                     });
                     
                     var closestDamagedStructure2 = tower[i].pos.findClosestByRange(FIND_STRUCTURES, {
-                        filter: (structure) => structure.structureType == STRUCTURE_RAMPART ? structure.hits < 1500000 : (structure.hits < (structure.hitsMax < 1500000 ? structure.hitsMax : 1500000))
+                        filter: (structure) => structure.structureType === STRUCTURE_RAMPART ? structure.hits < 1500000 : (structure.hits < (structure.hitsMax < 1500000 ? structure.hitsMax : 1500000))
                     });
                     
                     var closestDamagedStructure3 = tower[i].pos.findClosestByRange(FIND_STRUCTURES, {
-                        filter: (structure) => structure.structureType == STRUCTURE_RAMPART ? structure.hits < 5000000 : (structure.hits < (structure.hitsMax < 5000000 ? structure.hitsMax : 5000000))
+                        filter: (structure) => structure.structureType === STRUCTURE_RAMPART ? structure.hits < 5000000 : (structure.hits < (structure.hitsMax < 5000000 ? structure.hitsMax : 5000000))
                     });
 
                     if (initialDamagedStructure) {
@@ -60,15 +56,15 @@ var structureTower = {
                             }
                         }
                     }
-                } else if (tower[i].energy > 200 && hostiles.length == 0) {
-                    var closestDamagedStructure = tower[i].pos.findClosestByRange(FIND_STRUCTURES, {
-                        filter: (structure) => structure.structureType == STRUCTURE_RAMPART && structure.hits < 25000
+                } else if (tower[i].energy > 200 && hostiles.length === 0) {
+                    var closestDamaged = tower[i].pos.findClosestByRange(FIND_STRUCTURES, {
+                        filter: (structure) => structure.structureType === STRUCTURE_RAMPART && structure.hits < 25000
                     });
-                    tower[i].repair(closestDamagedStructure);
+                    tower[i].repair(closestDamaged);
                 }
                 var closestHostile = tower[i].pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-                var creepsHostile = tower[i].room.find(FIND_HOSTILE_CREEPS);
-                var healingCreep;
+                // var creepsHostile = tower[i].room.find(FIND_HOSTILE_CREEPS);
+                // var healingCreep;
                 //for (i = 0; i < creepsHostile.length; i++) {
                     //console.log(_.filter(creepsHostile[i].body, function(bp){return bp == MOVE;}).length)
                 //}

@@ -1,5 +1,3 @@
-var target_count = 0;
-
 var roleDefender = {
 
     /** @param {Creep} creep **/
@@ -9,12 +7,9 @@ var roleDefender = {
         var hostiles = room.find(FIND_HOSTILE_CREEPS);
         var targets = creep.room.find(FIND_STRUCTURES, {
             filter: (structure) => {
-                return structure.structureType == STRUCTURE_SPAWN;
+                return structure.structureType === STRUCTURE_SPAWN;
             }
         });
-
-//            var flag = Game.flags.F_W23N2;
-//            creep.moveTo(flag); 
 
         if (hostiles.length > 0) {
             creep.memory.timeToDeath = 0;
@@ -37,7 +32,7 @@ var roleDefender = {
                 try {
                     var ticks = creep.ticksToLive;
                     targets[0].renewCreep(creep);
-                    if (ticks == creep.ticksToLive) {
+                    if (ticks === creep.ticksToLive) {
                         creep.move(TOP);
                         creep.moveTo(targets[0]);
                     }
