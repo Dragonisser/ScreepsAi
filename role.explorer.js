@@ -22,10 +22,11 @@ let roleExplorer = {
 				creep.memory.room_dest = mapLib.getNextUnvisitedRoom(creep);
 			}
 			stuckTimer++;
-			
-			if(stuckTimer > 25) {
+			creep.memory.stuckTimer = stuckTimer;
+			if(stuckTimer > 50) {
 				creep.memory.room_stuck = creep.room.name;
-			} else if(stuckTimer > 50) {
+			}
+			if(stuckTimer > 75) {
 				if(creep.memory.room_stuck === creep.room.name) {
 					mapLib.removeFromRoomList(creep.memory.room_dest);
 					creep.memory.room_dest = mapLib.getNextUnvisitedRoom(creep);
@@ -34,8 +35,6 @@ let roleExplorer = {
 					creep.memory.room_stuck = creep.room.name;
 					creep.memory.stuckTimer = 0;
 				}
-			} else {
-				creep.memory.stuckTimer = stuckTimer;
 			}
         } else if (creep.memory.room_dest !== undefined) {
             creep.moveTo(new RoomPosition(25, 25, creep.memory.room_dest), {visualizePathStyle: {stroke: '#0000FF'}});

@@ -72,11 +72,13 @@ var roleHarvesterRoom = {
                 var targets = creep.room.find(FIND_STRUCTURES, {
                     filter: (structure) => {
                         return (structure.structureType === STRUCTURE_LINK || structure.structureType === STRUCTURE_TOWER || structure.structureType === STRUCTURE_SPAWN ||
-                            structure.structureType === STRUCTURE_EXTENSION) &&
-                            structure.energy < structure.energyCapacity;
+                            structure.structureType === STRUCTURE_EXTENSION)&& structure.energy < structure.energyCapacity;
                     }
                 });
-                targets = creep.pos.findClosestByPath(targets);
+				if(targets) {
+					targets = creep.pos.findClosestByPath(targets);
+				}
+				
                 //console.log(targets+" "+creep.name)
                 var target = Game.getObjectById('57833f1f5dfafa1e0c9e1a5e');
                 if (target && target.energy < target.energyCapacity) {
