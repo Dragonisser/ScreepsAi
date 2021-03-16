@@ -287,6 +287,7 @@ var spawnCreeps = {
                 spawn.spawnCreep([MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], "Explorer_" + number, {
                     memory: {
                         role: 'explorer',
+						stuckTimer: 0
                     }
                 });
             }
