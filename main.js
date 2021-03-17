@@ -27,10 +27,11 @@ var defender_spawn = 2;
 var claimer_spawn = 0;
 var filler_spawn = 0;
 
-mapLib.mapRoomsAroundStart(Game.spawns.Spawn1.room.name);
+if (!mapLib.getRoomList().length) {
+    mapLib.mapRoomsAroundStart(Game.spawns.Spawn1.room.name);
+}
 
 module.exports.loop = function () {
-    "use strict";
 
     let mapRooms = mapLib.getRoomListClaimable();
 
@@ -74,18 +75,20 @@ module.exports.loop = function () {
         roleLib.spawnFiller(spawn, room, room_Fillers.length, filler_spawn, room_Harvesters.length);
 
         //EXPLORER
-        roleLib.spawnExplorer(spawn, null, room_Explorer.length, mapLib.getGCLClaimsAvailable(), room_Harvesters.length);
+        if (mapLib.getUnivistedRooms().length) {
+            roleLib.spawnExplorer(spawn, null, room_Explorer.length, mapLib.getGCLClaimsAvailable(), room_Harvesters.length);
+        }
         
         for (let x = 0; x < mapRooms.length; x++) {
 
-            //var room_Harvesters_External = _.filter(role_Harvesters_External, (creep) => creep.memory.room_dest == mapRooms[x].room_name);
-            var room_Claimers = _.filter(role_Claimers, (creep) => creep.memory.room_dest === mapRooms[x].room_name);
+            var room_Harvesters_External = _.filter(role_Harvesters_External, (creep) => creep.memory.room_dest == mapRooms[x].name);
+            var room_Claimers = _.filter(role_Claimers, (creep) => creep.memory.room_dest === mapRooms[x].name);
 
             //HARVESTER_EXTERNAL
             roleLib.spawnHarvesterExternal(spawn, mapLib.getNextClaimableRoom(spawn), role_Harvesters_External.length, harvester_external_spawn);
             
             //CLAIMER
-            //roleLib.spawnClaimer(spawn, mapLib.getNextClaimableRoom(spawn), room_Claimers.length, mapLib.getGCLClaimsAvailable(), room_Harvesters.length);
+            roleLib.spawnClaimer(spawn, mapLib.getNextClaimableRoom(spawn), room_Claimers.length, 1, room_Harvesters.length);
         }
         
     }

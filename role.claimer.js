@@ -1,3 +1,5 @@
+let mapLib = require('mapLib');
+
 var roleClaimer = {
 
     run: function (creep) {
@@ -18,6 +20,7 @@ var roleClaimer = {
                 return structure.structureType === STRUCTURE_SPAWN;
             }
         })
+        var spawnRoom = Game.rooms[creep.memory.room_spawn];
 
         //console.log(creep.name + " " + targets)
 
@@ -63,7 +66,8 @@ var roleClaimer = {
                         // }
                         
                     }
-                    creep.suicide();
+                    //creep.suicide();
+                    creep.memory.room_dest = mapLib.getNextClaimableRoom(spawnRoom);
                 }
             }
 

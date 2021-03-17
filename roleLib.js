@@ -1,6 +1,5 @@
 var spawnCreeps = {
     spawnHarvester: function (spawn, roomDestination, creepsSpawned, creepsNeeded) {
-        "use strict";
         let room = spawn.room;
 
         if (creepsSpawned < creepsNeeded) {
@@ -27,9 +26,8 @@ var spawnCreeps = {
         }
     },
     spawnHarvesterExternal: function (spawn, roomDestination, creepsSpawned, creepsNeeded) {
-        "use strict";
 
-        let roomConstruct = Game.rooms[roomDestination.room_name];
+        let roomConstruct = Game.rooms[roomDestination];
         let constructSpawn;
         if (roomConstruct !== undefined) {
             constructSpawn = roomConstruct.find(FIND_CONSTRUCTION_SITES, {
@@ -43,11 +41,11 @@ var spawnCreeps = {
             if (creepsSpawned < creepsNeeded) {
                 if (spawn.room.energyAvailable >= 850) {
                     let number = Math.floor(Math.random() * (creepsSpawned + 1));
-                    if (spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], "Harvester_Ex_" + roomDestination.room_name + number, {dryRun: true}) === 0) {
-                        spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], "Harvester_Ex_" + roomDestination.room_name + "_" + number, {
+                    if (spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], "Harvester_Ex_" + roomDestination + number, {dryRun: true}) === 0) {
+                        spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], "Harvester_Ex_" + roomDestination + "_" + number, {
                             memory: {
                                 role: 'harvester_external',
-                                room_dest: roomDestination.room_name,
+                                room_dest: roomDestination,
                                 room_spawn: spawn.room.name,
                                 flag_dest_x: '25',
                                 flag_dest_y: '25'
@@ -56,11 +54,11 @@ var spawnCreeps = {
                     }
                 } else if (spawn.room.energyAvailable >= 650) {
                     let number = Math.floor(Math.random() * (creepsSpawned + 1));
-                    if (spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], "Harvester_Ex_" + roomDestination.room_name + number, {dryRun: true}) === 0) {
-                        spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], "Harvester_Ex_" + roomDestination.room_name + "_" + number, {
+                    if (spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], "Harvester_Ex_" + roomDestination + number, {dryRun: true}) === 0) {
+                        spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], "Harvester_Ex_" + roomDestination + "_" + number, {
                             memory: {
                                 role: 'harvester_external',
-                                room_dest: roomDestination.room_name,
+                                room_dest: roomDestination,
                                 room_spawn: spawn.room.name,
                                 flag_dest_x: '25',
                                 flag_dest_y: '25'
@@ -69,11 +67,11 @@ var spawnCreeps = {
                     }
                 } else {
                     let number = Math.floor(Math.random() * (creepsSpawned + 1));
-                    if (spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE], "Harvester_Ex_" + roomDestination.room_name + number, {dryRun: true}) === 0) {
-                        spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE], "Harvester_Ex_" + roomDestination.room_name + "_" + number, {
+                    if (spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE], "Harvester_Ex_" + roomDestination + number, {dryRun: true}) === 0) {
+                        spawn.spawnCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE], "Harvester_Ex_" + roomDestination + "_" + number, {
                             memory: {
                                 role: 'harvester_external',
-                                room_dest: roomDestination.room_name,
+                                room_dest: roomDestination,
                                 room_spawn: spawn.room.name,
                                 flag_dest_x: '25',
                                 flag_dest_y: '25'
@@ -85,7 +83,6 @@ var spawnCreeps = {
         }
     },
     spawnHarvesterMinderal: function (spawn, roomDestination, creepsSpawned, creepsNeeded, dependingCreepsSpawned) {
-        "use strict";
         let controllerLevel = roomDestination.controller.level;
 
         if(controllerLevel >= 6) {
@@ -120,7 +117,6 @@ var spawnCreeps = {
         }
     },
     spawnUpgrader: function (spawn, roomDestination, creepsSpawned, creepsNeeded, dependingCreepsSpawned) {
-        "use strict";
         let room = spawn.room;
         let controllerLevel = room.controller.level;
 
@@ -177,7 +173,6 @@ var spawnCreeps = {
 
     },
     spawnBuilder: function (spawn, roomDestination, creepsSpawned, creepsNeeded, dependingCreepsSpawned) {
-        "use strict";
         let targets = roomDestination.find(FIND_CONSTRUCTION_SITES);
         if (targets.length > 0 && targets.length <= 4) {
             creepsNeeded = 2;
@@ -220,7 +215,6 @@ var spawnCreeps = {
         }
     },
     spawnFiller: function (spawn, roomDestination, creepsSpawned, creepsNeeded, dependingCreepsSpawned) {
-        "use strict";
         let links = roomDestination.find(FIND_STRUCTURES, {
             filter: (structure) => {
                 return structure.structureType === STRUCTURE_LINK || structure.structureType === STRUCTURE_STORAGE;
@@ -259,9 +253,7 @@ var spawnCreeps = {
         }
     },
     spawnClaimer: function (spawn, roomDestination, creepsSpawned, creepsNeeded, dependingCreepsSpawned) {
-        "use strict";
-
-        let room = Game.rooms[roomDestination.room_name];
+        let room = Game.rooms[roomDestination];
 
         if (creepsSpawned < creepsNeeded && dependingCreepsSpawned > 0) {
             if (room !== undefined) {
@@ -271,6 +263,7 @@ var spawnCreeps = {
                         spawn.spawnCreep([CLAIM, MOVE, MOVE], "Claimer_" + room.name + "_" + number, {
                             memory: {
                                 role: 'claimer',
+                                room_spawn: spawn.room.name,
                                 room_dest: room.name
                             }
                         });
@@ -280,7 +273,6 @@ var spawnCreeps = {
         }
     },
     spawnExplorer: function (spawn, roomDestination, creepsSpawned, creepsNeeded, dependingCreepsSpawned) {
-        "use strict";
         if (creepsSpawned < creepsNeeded && dependingCreepsSpawned > 0) {
             let number = Math.floor(Math.random() * (creepsSpawned + 1));
             if (spawn.spawnCreep([MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], "Explorer_" + number, {dryRun: true}) === 0) {
