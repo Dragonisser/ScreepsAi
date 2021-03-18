@@ -20,9 +20,6 @@ var roleClaimer = {
                 return structure.structureType === STRUCTURE_SPAWN;
             }
         })
-        var spawnRoom = Game.rooms[creep.memory.room_spawn];
-
-        //console.log(creep.name + " " + targets)
 
         if (creep.memory.room_dest !== undefined && creep.room.name !== room_dest) {
             room_dest = creep.memory.room_dest;
@@ -66,8 +63,13 @@ var roleClaimer = {
                         // }
                         
                     }
-                    //creep.suicide();
-                    creep.memory.room_dest = mapLib.getNextClaimableRoom(spawnRoom);
+                    if (mapLib.getNextClaimableRoom(creep.memory.room_spawn)) {
+                        creep.memory.room_dest = mapLib.getNextClaimableRoom(creep.memory.room_spawn);
+                    } else {
+                        creep.suicide();
+                    }
+                    
+                    
                 }
             }
 

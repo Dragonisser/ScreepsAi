@@ -11,15 +11,16 @@ let mapLibFunctions = {
     setRoomList:function (roomList) {
         Memory.roomList = roomList;
     },
-    addToRoomList:function (roomName, roomClaimable, visited) {
+	addToRoomList: function (roomName, roomClaimable, visited, reachable, enemyControlled) {
         let mapRooms = this.getRoomList();
 
         if (!mapRooms.some(el => el.name === roomName)) {
-            mapRooms.push({name: roomName, claimable: roomClaimable, visited: visited});
+			mapRooms.push({
+				name: roomName, claimable: roomClaimable
+				, reachable: reachable, enemyControlled: enemyControlled, visited: visited
+			});
             this.setRoomList(mapRooms);
-            console.log("Added " + roomName + " to list as " 
-				+ (roomClaimable ? "claimable" : "not claimable") 
-				+ " and " + (visited ? "visited" : "not visited"));
+			console.log("Added " + roomName + " to list as");
         } else {
             return false;
         }
@@ -34,15 +35,28 @@ let mapLibFunctions = {
             console.log("Removed " + roomName + " from List. Reason: " + reason);
         }
     },
-	changeRoomClaimStatus:function (roomName, claimable) {
+	changeRoomStatus:function (roomName, status, boolean) {
 		let mapRooms = this.getRoomList();
         const index = mapRooms.findIndex(obj => obj.name == roomName);
 
 		if (index > -1) {
-			mapRooms[index].claim_room = claimable;
-			mapRooms[index].visited = true;
-			console.log("Marked " + roomName + " as claimable");
-			return true;
+			console.log("Change status '" + status + "' of room '" + roomName + "' with value '" + boolean + "'");
+			switch (status) {
+				case 'CLAIMABLE':
+					mapRooms[index].claimable = boolean;
+					return true;
+				case 'VISITED':
+					mapRooms[index].visited = boolean;
+					return true;
+				case 'REACHABLE':
+					mapRooms[index].reachable = boolean;
+					return true;
+				case 'ENEMYCONTROLLED':
+					mapRooms[index].enemyControlled = boolean;
+					return true;
+				default:
+					return false;
+            }
 		} else {
 			return false;
 		}
@@ -73,7 +87,7 @@ let mapLibFunctions = {
             return mapRooms[0].name;
         }
 	},
-	getUnivistedRooms() {
+	getUnivistedRooms: function () {
 		let mapRooms = this.getRoomList();
 		return mapRooms.filter(room => room.visited === false);
     },
@@ -90,22 +104,48 @@ let mapLibFunctions = {
                     }
                 }
             }
-        }
+		}
         return mapRooms.filter(room => room.claimable === true);
+	},
+	getRoomsWithUnbuildSpawn: function () {
+		let roomConstruct = [];
+		for (let i in Game.rooms) {
+			let room = Game.rooms[i];
+			if (room.controller !== undefined) {
+				if (room.controller.my || room.controller.my !== undefined) {
+					var constructSpawn = room.find(FIND_CONSTRUCTION_SITES, {
+						filter: (structure) => {
+							return structure.structureType === STRUCTURE_SPAWN && structure.my;
+						}
+					});
+					if (constructSpawn.length > 0) {
+						if (!roomConstruct.some(el => el.name === room.name)) {
+							roomConstruct.push(room);
+                        }
+                    }
+				}
+			}
+		}
+		return roomConstruct;
     },
-    getNextClaimableRoom:function (spawn) {
-        let claimableRooms = this.getRoomListClaimable();
+    getNextClaimableRoom:function (roomName) {
+		let claimableRooms = this.getRoomListClaimable();
+		let unbuildSpawns = this.getRoomsWithUnbuildSpawn();
 
         claimableRooms = claimableRooms.sort(function (a, b) {
-            let aDistance = Game.map.getRoomLinearDistance(spawn.room.name, a.name);
-            let bDistance = Game.map.getRoomLinearDistance(spawn.room.name, b.name);
+			let aDistance = Game.map.getRoomLinearDistance(roomName, a.name);
+			let bDistance = Game.map.getRoomLinearDistance(roomName, b.name);
 
             return aDistance - bDistance;
         })
 
-        if (claimableRooms.length > 0) {
-            return claimableRooms[0].name;
-        }
+		if (unbuildSpawns.length > 0) {
+			return unbuildSpawns[0].name;
+        } else if (claimableRooms.length > 0) {
+			return claimableRooms[0].name;
+		} else {
+			return claimableRooms;
+		}
     },
     getGCLClaimsAvailable:function () {
         let gcl = Game.gcl.level;
@@ -136,7 +176,7 @@ let mapLibFunctions = {
 					continue;
 				}
 				roomName = directionFirst + x + directionSecond + y;
-				this.addToRoomList(roomName, false, false);
+				this.addToRoomList(roomName, false, false, true, false);
 			}
 		}
 	},

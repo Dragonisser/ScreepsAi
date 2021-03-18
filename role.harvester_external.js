@@ -56,11 +56,10 @@ var roleHarvesterRoom = {
 
         if (creep.room === Game.rooms[room_spawn]) {
 
-            if (creep.memory.building && creep.store.energy === 0) {
+            if (creep.memory.building && creep.store.getUsedCapacity([RESOURCE_ENERGY]) === 0) {
                 creep.memory.building = false;
             }
-
-            if (!creep.memory.building && creep.store.energy === creep.store.getCapacity()) {
+            if (!creep.memory.building && creep.store.getUsedCapacity([RESOURCE_ENERGY]) === creep.store.getCapacity([RESOURCE_ENERGY])) {
                 creep.memory.building = true;
             }
 
@@ -71,21 +70,16 @@ var roleHarvesterRoom = {
 
                 var targets = creep.room.find(FIND_STRUCTURES, {
                     filter: (structure) => {
-                        return (structure.structureType === STRUCTURE_LINK || structure.structureType === STRUCTURE_TOWER || structure.structureType === STRUCTURE_SPAWN ||
-                            structure.structureType === STRUCTURE_EXTENSION)&& structure.energy < structure.energyCapacity;
+                        return (structure.structureType === STRUCTURE_LINK || structure.structureType === STRUCTURE_TOWER
+                            || structure.structureType === STRUCTURE_SPAWN || structure.structureType === STRUCTURE_EXTENSION)
+                            && structure.store.getUsedCapacity([RESOURCE_ENERGY]) < structure.store.getCapacity([RESOURCE_ENERGY]);
                     }
                 });
 				if(targets) {
 					targets = creep.pos.findClosestByPath(targets);
 				}
 				
-                //console.log(targets+" "+creep.name)
-                var target = Game.getObjectById('57833f1f5dfafa1e0c9e1a5e');
-                if (target && target.energy < target.energyCapacity) {
-                    if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target, {visualizePathStyle: {stroke: '#ffffff'}});
-                    }
-                } else if (targets) {
+                if (targets) {
                     if (creep.transfer(targets, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
                         creep.moveTo(targets, {visualizePathStyle: {stroke: '#ffffff'}});
                     }
@@ -94,11 +88,11 @@ var roleHarvesterRoom = {
                         creep.moveTo(creep.room.storage, {visualizePathStyle: {stroke: '#ffffff'}});
                     }
                 } else {
-                    creep.moveTo(Game.rooms[room_spawn], {visualizePathStyle: {stroke: '#ffffff'}});
+                    creep.moveTo(new RoomPosition(25, 25, Game.rooms[room_spawn].name), {visualizePathStyle: {stroke: '#ffffff'}});
                 }
             }
         } else if (creep.room === Game.rooms[room_dest]) {
-            if (creep.store.energy < creep.store.getCapacity() && !creep.memory.building) {
+            if (creep.store.getUsedCapacity([RESOURCE_ENERGY]) < creep.store.getCapacity([RESOURCE_ENERGY]) && !creep.memory.building) {
                 creep.say("⛏︎")
                 var sources = creep.pos.findClosestByPath(FIND_SOURCES);
                 if (creep.harvest(sources) === ERR_NOT_IN_RANGE) {

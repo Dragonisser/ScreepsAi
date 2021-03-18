@@ -13,9 +13,9 @@ var roleBuilder = {
         
         let targetEnergy = creep.pos.findClosestByPath(FIND_STRUCTURES, {
              filter: (structure) => {
-                return (structure.structureType === STRUCTURE_LINK || structure.structureType === STRUCTURE_TOWER || structure.structureType === STRUCTURE_SPAWN ||
-                    structure.structureType === STRUCTURE_EXTENSION) &&
-                    structure.energy < structure.energyCapacity;
+                return (structure.structureType === STRUCTURE_LINK || structure.structureType === STRUCTURE_TOWER
+                    || structure.structureType === STRUCTURE_SPAWN || structure.structureType === STRUCTURE_EXTENSION)
+                    && structure.store.getUsedCapacity([RESOURCE_ENERGY]) < structure.store.getCapacity([RESOURCE_ENERGY]);
                 }
         });
 
@@ -24,10 +24,10 @@ var roleBuilder = {
             var roomName = String(room_dest);
             creep.moveTo(new RoomPosition(25, 25, roomName));
         } else {
-            if (creep.memory.building && creep.store.energy === 0) {
+            if (creep.memory.building && creep.store.getUsedCapacity([RESOURCE_ENERGY]) === 0) {
                 creep.memory.building = false;
             }
-            if (!creep.memory.building && creep.store.energy === creep.store.getCapacity()) {
+            if (!creep.memory.building && creep.store.getUsedCapacity([RESOURCE_ENERGY]) === creep.store.getCapacity([RESOURCE_ENERGY])) {
                 creep.memory.building = true;
             }
 

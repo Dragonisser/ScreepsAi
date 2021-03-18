@@ -5,10 +5,10 @@ var roleBuilder = {
 
     run: function (creep) {
 
-        if (creep.memory.building && creep.carry.energy === 0) {
+        if (creep.memory.building && creep.store.getUsedCapacity([RESOURCE_ENERGY]) === 0) {
             creep.memory.building = false;
         }
-        if (!creep.memory.building && creep.carry.energy === creep.carryCapacity) {
+        if (!creep.memory.building && creep.store.getUsedCapacity([RESOURCE_ENERGY]) === creep.store.getCapacity([RESOURCE_ENERGY])) {
             creep.memory.building = true;
         }
 

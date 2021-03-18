@@ -11,10 +11,10 @@ var roleFiller = {
             }
         });
 
-        if (creep.memory.building && creep.store.energy === 0) {
+        if (creep.memory.building && creep.store.getUsedCapacity([RESOURCE_ENERGY]) === 0) {
             creep.memory.building = false;
         }
-        if (!creep.memory.building && creep.store.energy === creep.store.getCapacity()) {
+        if (!creep.memory.building && creep.store.getUsedCapacity([RESOURCE_ENERGY]) === creep.store.getCapacity([RESOURCE_ENERGY])) {
             creep.memory.building = true;
         }
         
@@ -36,14 +36,14 @@ var roleFiller = {
         
         var targets = creep.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: (structure) => {
-                return (structure.structureType === STRUCTURE_EXTENSION || structure.structureType === STRUCTURE_SPAWN ) &&
-                    structure.energy < structure.energyCapacity;
+                return (structure.structureType === STRUCTURE_EXTENSION || structure.structureType === STRUCTURE_SPAWN)
+                    && structure.store.getUsedCapacity([RESOURCE_ENERGY]) < structure.store.getCapacity([RESOURCE_ENERGY]);
             }
         });
         var targetTower = creep.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: (structure) => {
-                return structure.structureType === STRUCTURE_TOWER &&
-                    structure.energy < structure.energyCapacity * 0.75;
+                return structure.structureType === STRUCTURE_TOWER
+                    && structure.store.getUsedCapacity([RESOURCE_ENERGY]) < structure.store.getCapacity([RESOURCE_ENERGY]) * 0.75;
             }
         });
 

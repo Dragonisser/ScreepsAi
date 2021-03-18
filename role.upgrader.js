@@ -25,11 +25,10 @@ var roleUpgrader = {
             var roomName = String(room_dest);
             creep.moveTo(new RoomPosition(25, 25, roomName));
         } else {
-            if (creep.memory.building && creep.store.energy === 0) {
+            if (creep.memory.building && creep.store.getUsedCapacity([RESOURCE_ENERGY]) === 0) {
                 creep.memory.building = false;
             }
-            if (!creep.memory.building
-                && creep.carry.energy === creep.store.getCapacity()) {
+            if (!creep.memory.building && creep.store.getUsedCapacity([RESOURCE_ENERGY]) === creep.store.getCapacity([RESOURCE_ENERGY])) {
                 creep.memory.building = true;
             }
 

@@ -31,6 +31,12 @@ if (!mapLib.getRoomList().length) {
     mapLib.mapRoomsAroundStart(Game.spawns.Spawn1.room.name);
 }
 
+mapLib.getRoomListClaimable().forEach(el => console.log(el.name));
+console.log(mapLib.getNextClaimableRoom(Game.spawns.Spawn1.room.name));
+console.log(mapLib.getGCLClaimsAvailable());
+console.log(mapLib.getRoomsWithUnbuildSpawn());
+
+
 module.exports.loop = function () {
 
     let mapRooms = mapLib.getRoomListClaimable();
@@ -85,12 +91,11 @@ module.exports.loop = function () {
             var room_Claimers = _.filter(role_Claimers, (creep) => creep.memory.room_dest === mapRooms[x].name);
 
             //HARVESTER_EXTERNAL
-            roleLib.spawnHarvesterExternal(spawn, mapLib.getNextClaimableRoom(spawn), role_Harvesters_External.length, harvester_external_spawn);
+            roleLib.spawnHarvesterExternal(spawn, mapLib.getNextClaimableRoom(room.name), room_Harvesters_External.length, harvester_external_spawn);
             
             //CLAIMER
-            roleLib.spawnClaimer(spawn, mapLib.getNextClaimableRoom(spawn), room_Claimers.length, 1, room_Harvesters.length);
+            roleLib.spawnClaimer(spawn, mapLib.getNextClaimableRoom(room.name), room_Claimers.length, mapLib.getGCLClaimsAvailable() / 2, room_Harvesters.length);
         }
-        
     }
 
 
@@ -109,7 +114,6 @@ module.exports.loop = function () {
 
     for (let name in Game.creeps) {
         let creep = Game.creeps[name];
-        //roleNotifier.run(creep);
         switch (creep.memory.role) {
             case 'harvester':
                 roleHarvester.run(creep);

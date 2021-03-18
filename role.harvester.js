@@ -7,7 +7,7 @@ var roleHarvester = {
         var filler = _.filter(Game.creeps, (creep) => creep.memory.role === 'filler');
         var sources = creep.pos.findClosestByPath(FIND_SOURCES);
 
-        if (creep.store.energy < creep.store.getCapacity()) {
+        if (creep.store.getUsedCapacity([RESOURCE_ENERGY]) < creep.store.getCapacity([RESOURCE_ENERGY])) {
             creep.say("⛏")
             if (creep.harvest(sources) === ERR_NOT_IN_RANGE) {
                 creep.moveTo(sources, {visualizePathStyle: {stroke: '#ffaa00'}});
@@ -15,12 +15,13 @@ var roleHarvester = {
         }
         else {
             var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                    filter: (structure) => {
-                        return (structure.structureType === STRUCTURE_LINK || structure.structureType === STRUCTURE_SPAWN ||
-                            structure.structureType === STRUCTURE_EXTENSION || structure.structureType === STRUCTURE_TOWER) &&
-                            structure.energy < structure.energyCapacity;
+                filter: (structure) => {
+                    return (structure.structureType === STRUCTURE_LINK || structure.structureType === STRUCTURE_SPAWN
+                        || structure.structureType === STRUCTURE_EXTENSION || structure.structureType === STRUCTURE_TOWER)
+                        && structure.store.getUsedCapacity([RESOURCE_ENERGY]) < structure.store.getCapacity([RESOURCE_ENERGY]);
                     }
             });
+
             var tower = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                     filter: (structure) => {
                         return structure.structureType === STRUCTURE_TOWER;

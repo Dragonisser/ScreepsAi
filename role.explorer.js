@@ -32,7 +32,8 @@ let roleExplorer = {
 			}
 			if(stuckTimer > 75) {
 				if(creep.memory.room_stuck === creep.room.name) {
-					mapLib.removeFromRoomList(creep.memory.room_dest, "Unreachable");
+                    mapLib.changeRoomStatus(room_dest, 'REACHABLE', false);
+                    mapLib.changeRoomStatus(room_dest, 'VISITED', true);
 					creep.memory.room_dest = mapLib.getNextUnvisitedRoom(creep);
 					creep.memory.stuckTimer = 0;
 				} else {
@@ -41,9 +42,10 @@ let roleExplorer = {
 				}
 			}
         } else if (creep.memory.room_dest !== undefined) {
-            creep.moveTo(new RoomPosition(25, 25, creep.memory.room_dest), {visualizePathStyle: {stroke: '#0000FF'}});
+            creep.moveTo(new RoomPosition(25, 25, creep.memory.room_dest), { visualizePathStyle: { stroke: '#0000FF' } });
             if (room.controller != null) {
                 if (!room.controller.my && room.controller.owner === undefined) {
+                   
 
                     let sources = creep.room.find(FIND_SOURCES);
                     const terrain = Game.map.getRoomTerrain(creep.memory.room_dest);
@@ -64,17 +66,18 @@ let roleExplorer = {
                         }
                     }
                     if (sourceAccessPoints >= 4) {
-                        if (mapLib.changeRoomClaimStatus(room_dest, true)) {
-                            creep.memory.room_dest = mapLib.getNextUnvisitedRoom(creep);
-                        }
+                        mapLib.changeRoomStatus(room_dest, 'CLAIMABLE', true);
+                        mapLib.changeRoomStatus(room_dest, 'VISITED', true);
+                        creep.memory.room_dest = mapLib.getNextUnvisitedRoom(creep);
                     } else {
-                        if (mapLib.changeRoomClaimStatus(room_dest, false)) {
-                            creep.memory.room_dest = mapLib.getNextUnvisitedRoom(creep);
-                        }
+                        mapLib.changeRoomStatus(room_dest, 'CLAIMABLE', false);
+                        mapLib.changeRoomStatus(room_dest, 'VISITED', true);
+                        creep.memory.room_dest = mapLib.getNextUnvisitedRoom(creep);
                     }
                 }
             } else {
-				mapLib.removeFromRoomList(creep.memory.room_dest, "Enemy Controlled");
+                mapLib.changeRoomStatus(room_dest, 'ENEMY', true);
+                mapLib.changeRoomStatus(room_dest, 'VISITED', true);
                 creep.memory.room_dest = mapLib.getNextUnvisitedRoom(creep);
             }
         } else {
