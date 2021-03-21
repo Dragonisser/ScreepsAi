@@ -20,7 +20,7 @@ let mapLibFunctions = {
 				, reachable: reachable, enemyControlled: enemyControlled, visited: visited
 			});
             this.setRoomList(mapRooms);
-			console.log("Added " + roomName + " to list as");
+			console.log("Added " + roomName + " to list");
         } else {
             return false;
         }
