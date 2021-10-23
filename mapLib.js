@@ -17,17 +17,18 @@ let mapLibFunctions = {
         if (!mapRooms.some(el => el.name === roomName)) {
 			mapRooms.push({
 				name: roomName, claimable: roomClaimable
-				, reachable: reachable, enemyControlled: enemyControlled, visited: visited
+				, reachable: reachable, enemyControlled: enemyControlled
+				, visited: visited, sourceSpots: []
 			});
             this.setRoomList(mapRooms);
-			console.log("Added " + roomName + " to list");
+			console.log("Added " + roomName + " to list.");
         } else {
             return false;
         }
     },
     removeFromRoomList:function (roomName, reason) {
         let mapRooms = this.getRoomList();
-        const index = mapRooms.findIndex(obj => obj.name == roomName);
+        const index = mapRooms.findIndex(obj => obj.name === roomName);
 		
         if (index > -1) {
             mapRooms.splice(index, 1);
@@ -37,7 +38,7 @@ let mapLibFunctions = {
     },
 	changeRoomStatus:function (roomName, status, boolean) {
 		let mapRooms = this.getRoomList();
-        const index = mapRooms.findIndex(obj => obj.name == roomName);
+        const index = mapRooms.findIndex(obj => obj.name === roomName);
 
 		if (index > -1) {
 			console.log("Change status '" + status + "' of room '" + roomName + "' with value '" + boolean + "'");
@@ -64,7 +65,7 @@ let mapLibFunctions = {
 	},
 	checkIfRoomVisited:function (roomName) {
 		let mapRooms = this.getRoomList();
-        const index = mapRooms.findIndex(obj => obj.name == roomName);
+        const index = mapRooms.findIndex(obj => obj.name === roomName);
 		if (index > -1) {
 			return mapRooms[index].visited;
 		} else {
@@ -87,10 +88,14 @@ let mapLibFunctions = {
             return mapRooms[0].name;
         }
 	},
-	getUnivistedRooms: function () {
+	getUnvisitedRooms: function () {
 		let mapRooms = this.getRoomList();
 		return mapRooms.filter(room => room.visited === false);
     },
+	getDistanceToUnvisitedRoom:function (creep, roomName) {
+    	let dist = Game.map.getRoomLinearDistance(creep.room.name, roomName);
+		return dist ? dist : 1;
+	},
     getRoomListClaimable:function () {
         let mapRooms = this.getRoomList();
         
@@ -169,13 +174,13 @@ let mapLibFunctions = {
 		let numberFirst = nameArr[1]; //7
 		let directionSecond = nameArr[2]; //N
 		let numberSecond = nameArr[3]; //3
-		
-		for (let x = 0; x < 10; x++) {
-			for (let y = 0; y < 10; y++) {
+
+		for (let x = 0; x <= 10; x++) {
+			for (let y = 0; y <= 10; y++) {
 				if(x === numberFirst && y === numberSecond) {
 					continue;
 				}
-				roomName = directionFirst + x + directionSecond + y;
+				let roomName = directionFirst + x + directionSecond + y;
 				this.addToRoomList(roomName, false, false, true, false);
 			}
 		}
@@ -205,6 +210,42 @@ let mapLibFunctions = {
 		
 		return [directionFirst,numberFirst,directionSecond,numberSecond];
 		
+	},
+	getSourceHarvestSpots:function (roomName) {
+		let mapRooms = this.getRoomList();
+		const index = mapRooms.findIndex(obj => obj.name === roomName);
+		if (index > -1) {
+			return mapRooms[index].sourceSpots.length;
+		} else {
+			return 0;
+		}
+	},
+	addSourceSpotsToList:function (creep) {
+		let mapRooms = this.getRoomList();
+		let roomName = creep.room.name;
+		const index = mapRooms.findIndex(obj => obj.name === roomName);
+		if (index > -1) {
+			let sources = creep.room.find(FIND_SOURCES);
+			const terrain = Game.map.getRoomTerrain(creep.memory.room_dest);
+
+			for (let source in sources) {
+
+				let posX = sources[source].pos.x;
+				let posY = sources[source].pos.y;
+
+
+				for (let i = posX - 1; i <= posX + 1; i++) {
+					for (let j = posY - 1; j <= posY + 1; j++) {
+						switch(terrain.get(i, j)) {
+							case TERRAIN_MASK_SWAMP:
+							case 0:
+								mapRooms[index].sourceSpots.push({x: i, y: j});
+								break;
+						}
+					}
+				}
+			}
+		}
 	},
 	isNumericChar:function (c) {
 		return /\d/.test(c); 

@@ -59,7 +59,7 @@ var roleFiller = {
             } else if(creep.room.storage && creep.room.storage.store.getUsedCapacity() < creep.room.storage.store.getCapacity()) {
                 var storage = creep.room.storage;
                 for(const resourceType in creep.store) {
-                    if (creep.transfer(storage, resourceType) === ERR_NOT_IN_RANGE) {
+                    if (creep.transfer(storage, 0) === ERR_NOT_IN_RANGE) {
                         creep.moveTo(storage, {visualizePathStyle: {stroke: '#ffffff'}});
                     }
                 }

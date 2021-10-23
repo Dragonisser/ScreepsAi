@@ -16,7 +16,7 @@ var structureTower = {
             for (i = 0; i < tower.length; i++) {
                 if (tower[i].energy > 500 && roomName.energyAvailable > 500 && hostiles.length === 0) {
                     var initialDamagedStructure = tower[i].pos.findClosestByRange(FIND_STRUCTURES, {
-                        filter: (structure) => structure.structureType === STRUCTURE_RAMPART ? structure.hits < 5000 : (structure.hits < (structure.hitsMax <5000 ? structure.hitsMax : 5000))
+                        filter: (structure) => structure.structureType === STRUCTURE_RAMPART ? structure.hits < 5000 && structure.ticksToDecay < 100 : (structure.hits < (structure.hitsMax <5000 ? structure.hitsMax : 5000))
                     });
 
                     var closestDamagedStructure = tower[i].pos.findClosestByRange(FIND_STRUCTURES, {

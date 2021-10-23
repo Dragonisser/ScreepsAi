@@ -31,10 +31,13 @@ if (!mapLib.getRoomList().length) {
     mapLib.mapRoomsAroundStart(Game.spawns.Spawn1.room.name);
 }
 
-mapLib.getRoomListClaimable().forEach(el => console.log(el.name));
-console.log(mapLib.getNextClaimableRoom(Game.spawns.Spawn1.room.name));
-console.log(mapLib.getGCLClaimsAvailable());
-console.log(mapLib.getRoomsWithUnbuildSpawn());
+//mapLib.getRoomListClaimable().forEach(el => console.log(el.name));
+//console.log(mapLib.getNextClaimableRoom("Next: " + Game.spawns.Spawn1.room.name));
+//console.log(mapLib.getUnvisitedRooms().forEach(el => console.log(el.name)));
+//console.log(mapLib.getGCLClaimsAvailable());
+//console.log(mapLib.getRoomsWithUnbuildSpawn());
+
+//mapLib.getRoomList().forEach(el => el.visited = false)
 
 
 module.exports.loop = function () {
@@ -81,8 +84,8 @@ module.exports.loop = function () {
         roleLib.spawnFiller(spawn, room, room_Fillers.length, filler_spawn, room_Harvesters.length);
 
         //EXPLORER
-        if (mapLib.getUnivistedRooms().length) {
-            roleLib.spawnExplorer(spawn, null, room_Explorer.length, mapLib.getGCLClaimsAvailable(), room_Harvesters.length);
+        if (mapLib.getUnvisitedRooms().length) {
+            roleLib.spawnExplorer(spawn, null, room_Explorer.length, mapLib.getGCLClaimsAvailable() ? mapLib.getGCLClaimsAvailable() : 5, room_Harvesters.length);
         }
         
         for (let x = 0; x < mapRooms.length; x++) {
